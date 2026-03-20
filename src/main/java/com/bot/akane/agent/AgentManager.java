@@ -1,5 +1,6 @@
 package com.bot.akane.agent;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.bot.akane.agent.tools.ToolInterface;
@@ -35,10 +37,27 @@ public class AgentManager {
 
     @Value("${agent.name:akane}")
     private String agentName;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    private static final String GROUP_CHAT_LOCK_KEY_PREFIX = "akane:chat:lock:";
+    //防止意外导致锁无法释放，设置5分钟过期
+    private static final Duration GROUP_CHAT_LOCK_TTL = Duration.ofMinutes(5);
     
     public String chat(String groupId, String userInput) {
+        String lockKey = GROUP_CHAT_LOCK_KEY_PREFIX + groupId;
+        Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", GROUP_CHAT_LOCK_TTL);
+        if (!Boolean.TRUE.equals(lockAcquired)) {
+            return "AI思考中，请稍后";
+        }
+
         Agent agent = agentCache.computeIfAbsent(groupId, id -> createNewAgent(id));
-        return agent.chat(userInput);
+        try {
+            return agent.chat(userInput);
+        } finally {
+            redisTemplate.delete(lockKey);
+        }
     }
 
     private Agent createNewAgent(String groupId) {

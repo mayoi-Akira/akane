@@ -3,14 +3,14 @@ package com.bot.akane.service.impl;
 import org.springframework.stereotype.Service;
 
 import com.bot.akane.agent.AgentManager;
-import com.bot.akane.service.GroupChat;
+import com.bot.akane.service.GroupChatService;
 import com.bot.akane.service.GroupToolService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class GroupChatImpl implements GroupChat{
+public class GroupChatServiceImpl implements GroupChatService{
     
     private final AgentManager agentManager;
     private final GroupToolService groupToolService;

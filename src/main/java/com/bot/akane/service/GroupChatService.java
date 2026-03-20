@@ -1,6 +1,6 @@
 package com.bot.akane.service;
 
-public interface GroupChat {
+public interface GroupChatService {
     /**
      * 聊天
      * @param groupId 群ID

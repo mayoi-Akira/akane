@@ -1,5 +1,7 @@
 package com.bot.akane.agent;
 
+import java.util.List;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallback;
 
@@ -14,9 +16,9 @@ public class Agent extends AgentV2{
                  Integer maxMessages,
                  Integer maxSteps,
                  String sessionId,
-                 java.util.List<ToolCallback> availableTools) {
+                 List<ToolCallback> availableTools) {
         super(name, description, systemPrompt, chatClient, maxMessages, maxSteps, sessionId, availableTools);
     }
     
-    
+
 }
