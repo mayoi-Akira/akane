@@ -23,5 +23,7 @@ spring:
       chat:
         options:
           model:
-
+weather:
+  api-key:
+  api-host:
 DEFAULT_MAX_MESSAGES:
