@@ -74,7 +74,7 @@
         FROM tools t
     </insert>
 
-    <update id="enableAllMappingsForAllGroups">
+    <!-- <update id="enableAllMappingsForAllGroups">
         UPDATE group_tool_mapping
         SET is_enabled = TRUE
     </update>
@@ -84,6 +84,6 @@
         SELECT g.group_id, t.tool_code, TRUE
         FROM `group` g
         CROSS JOIN tools t
-    </insert>
+    </insert> -->
 
 </mapper>

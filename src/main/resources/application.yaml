@@ -31,6 +31,9 @@ weather:
   api-key:
   api-host:
 DEFAULT_MAX_MESSAGES:
+Agent:
+  name: akane-agent
+  system-prompt: 你是一个AI助手，请根据内容调用合适的工具并作出合适的回答，现在你正处于QQ聊天环境，因此不要输出Markdown以及其他格式，只要纯文本。
 mybatis:
   type-aliases-package: com.bot.akane.model.entity
   mapper-locations: classpath:mapper/*.xml

@@ -12,28 +12,28 @@ public interface GroupToolMapper {
 
     List<Tools> selectAllTools();
 
-    List<Tools> selectEnabledToolsByGroupId(@Param("groupId") Long groupId);
+    List<Tools> selectEnabledToolsByGroupId(@Param("groupId") String groupId);
 
     Tools selectToolByCode(@Param("toolCode") String toolCode);
 
     List<String> selectExistingToolCodes(@Param("toolCodes") List<String> toolCodes);
 
-    int insertGroupConfigIfAbsent(@Param("groupId") Long groupId);
+    int insertGroupConfigIfAbsent(@Param("groupId") String groupId);
 
     int insertToolIfAbsent(@Param("tool") Tools tool);
 
-    int disableMappingsByGroupId(@Param("groupId") Long groupId);
+    int disableMappingsByGroupId(@Param("groupId") String groupId);
 
     int upsertGroupToolMapping(
-            @Param("groupId") Long groupId,
+            @Param("groupId") String groupId,
             @Param("toolCode") String toolCode,
             @Param("isEnabled") Boolean isEnabled);
 
-    int enableMappingsByGroupId(@Param("groupId") Long groupId);
+    int enableMappingsByGroupId(@Param("groupId") String groupId);
 
-    int enableAllToolsForGroup(@Param("groupId") Long groupId);
+    int enableAllToolsForGroup(@Param("groupId") String groupId);
 
-    int enableAllMappingsForAllGroups();
+    // int enableAllMappingsForAllGroups();
 
-    int enableAllToolsForAllGroups();
+    // int enableAllToolsForAllGroups();
 }

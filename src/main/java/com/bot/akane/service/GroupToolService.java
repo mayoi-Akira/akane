@@ -1,18 +1,20 @@
 package com.bot.akane.service;
 
+import java.util.List;
+
 public interface GroupToolService {
     /**
      * 获取全部可用的工具列表
      * @return 包含工具信息的字符串列表，每个字符串包含工具名称
      */
-    String getAvailableTools();
+    List<String> getAvailableTools();
 
     /**
      * 获取指定群聊的工具列表
      * @param groupId 群聊ID
      * @return 包含工具信息的字符串列表，每个字符串包含工具名称和描述
      */
-    String getToolsForGroup(String groupId);
+    List<String> getToolsForGroup(String groupId);
 
     /**
     * 获取指定工具的详细信息

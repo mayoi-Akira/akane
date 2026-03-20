@@ -40,10 +40,7 @@ public class ToolDataInitializer implements ApplicationRunner {
             groupToolMapper.insertToolIfAbsent(tool);
         }
 
-        // 所有已存在群默认可用全部工具
-        groupToolMapper.enableAllMappingsForAllGroups();
-        groupToolMapper.enableAllToolsForAllGroups();
 
-        log.info("工具初始化完成，工具数量: {}，已为所有群启用全部工具", toolBeans.size());
+        log.info("工具初始化完成，工具数量: {}", toolBeans.size());
     }
 }

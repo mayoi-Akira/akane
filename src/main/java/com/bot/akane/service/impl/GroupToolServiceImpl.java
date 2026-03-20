@@ -13,7 +13,9 @@ import com.bot.akane.model.entity.Tools;
 import com.bot.akane.service.GroupToolService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupToolServiceImpl implements GroupToolService {
@@ -21,42 +23,47 @@ public class GroupToolServiceImpl implements GroupToolService {
 	private final GroupToolMapper groupToolMapper;
 
 	@Override
-	public String getAvailableTools() {
+	public List<String> getAvailableTools() {
 		List<Tools> tools = groupToolMapper.selectAllTools();
 		if (tools == null || tools.isEmpty()) {
-			return "暂无可用工具。";
+			log.info("暂无可用工具。");
+			return List.of();
 		}
 
 		String details = tools.stream()
 				.map(this::formatToolLine)
 				.collect(Collectors.joining("\n"));
-		return "全部可用工具:\n" + details;
+		log.info("全部可用工具:\n{}", details);
+		return tools.stream().map(Tools::getToolCode).toList();
 	}
 
 	@Override
 	@Transactional
-	public String getToolsForGroup(String groupId) {
-		Long parsedGroupId = parseGroupId(groupId);
-		if (parsedGroupId == null) {
-			return "群聊ID格式错误。";
+	public List<String> getToolsForGroup(String groupId) {
+		if (groupId == null || groupId.trim().isEmpty()) {
+			log.warn("群聊ID格式错误，无法获取群工具列表。");
+			return List.of();
+		}
+		String cleanGroupId = groupId.trim();
+
+		List<Tools> tools = groupToolMapper.selectEnabledToolsByGroupId(cleanGroupId);
+		if (tools == null || tools.isEmpty()) {
+			groupToolMapper.insertGroupConfigIfAbsent(cleanGroupId);
+			groupToolMapper.enableMappingsByGroupId(cleanGroupId);
+			groupToolMapper.enableAllToolsForGroup(cleanGroupId);
+			tools = groupToolMapper.selectEnabledToolsByGroupId(cleanGroupId);
 		}
 
-		List<Tools> tools = groupToolMapper.selectEnabledToolsByGroupId(parsedGroupId);
 		if (tools == null || tools.isEmpty()) {
-			groupToolMapper.insertGroupConfigIfAbsent(parsedGroupId);
-			groupToolMapper.enableMappingsByGroupId(parsedGroupId);
-			groupToolMapper.enableAllToolsForGroup(parsedGroupId);
-			tools = groupToolMapper.selectEnabledToolsByGroupId(parsedGroupId);
-		}
-
-		if (tools == null || tools.isEmpty()) {
-			return "暂无可用工具。";
+			log.info("群 " + cleanGroupId + " 暂无可用工具。");
+			return List.of();
 		}
 
 		String details = tools.stream()
 				.map(this::formatToolLine)
 				.collect(Collectors.joining("\n"));
-		return "群 " + parsedGroupId + " 的启用工具:\n" + details;
+		log.info("群 " + cleanGroupId + " 的启用工具:\n" + details);
+		return tools.stream().map(Tools::getToolCode).toList();
 	}
 
 	@Override
@@ -79,10 +86,10 @@ public class GroupToolServiceImpl implements GroupToolService {
 	@Override
 	@Transactional
 	public String updateToolsForGroup(String groupId, String[] toolNames) {
-		Long parsedGroupId = parseGroupId(groupId);
-		if (parsedGroupId == null) {
-			return "群聊ID格式错误。";
+		if (groupId == null || groupId.trim().isEmpty()) {
+			return "群聊ID不能为空。";
 		}
+		String cleanGroupId = groupId.trim();
 
 		if (toolNames == null || toolNames.length == 0) {
 			return "工具列表不能为空。";
@@ -107,12 +114,12 @@ public class GroupToolServiceImpl implements GroupToolService {
 			return "以下工具不存在: " + String.join(", ", missingToolCodes);
 		}
 
-		groupToolMapper.insertGroupConfigIfAbsent(parsedGroupId);
-		groupToolMapper.disableMappingsByGroupId(parsedGroupId);
+		groupToolMapper.insertGroupConfigIfAbsent(cleanGroupId);
+		groupToolMapper.disableMappingsByGroupId(cleanGroupId);
 		normalizedToolCodes.forEach(toolCode ->
-				groupToolMapper.upsertGroupToolMapping(parsedGroupId, toolCode, true));
+				groupToolMapper.upsertGroupToolMapping(cleanGroupId, toolCode, true));
 
-		return "群 " + parsedGroupId + " 工具更新成功，已启用: " + String.join(", ", normalizedToolCodes);
+		return "群 " + cleanGroupId + " 工具更新成功，已启用: " + String.join(", ", normalizedToolCodes);
 	}
 
 	private String formatToolLine(Tools tool) {
@@ -121,16 +128,5 @@ public class GroupToolServiceImpl implements GroupToolService {
 
 	private String nullToEmpty(String text) {
 		return text == null ? "" : text;
-	}
-
-	private Long parseGroupId(String groupId) {
-		if (groupId == null || groupId.trim().isEmpty()) {
-			return null;
-		}
-		try {
-			return Long.parseLong(groupId.trim());
-		} catch (NumberFormatException ex) {
-			return null;
-		}
 	}
 }
