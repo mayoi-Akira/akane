@@ -29,7 +29,7 @@ public class AgentV2Test {
 
     @Test
     public void testAgentV2() {
-        String userInput = "请告诉我现在的日期和时间，以及大连金州区未来3天的天气预报。";
+        String userInput = "今晚大连金州会下雨吗？";
         String prompt = "你是一个智能助手，能够提供当前日期和时间，以及天气预报。";
         ToolCallback[] toolCallbacks = MethodToolCallbackProvider.builder()
                 .toolObjects(dateTimeTool, weatherTools)

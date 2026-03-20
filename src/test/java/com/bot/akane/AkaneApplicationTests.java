@@ -8,6 +8,7 @@ class AkaneApplicationTests {
 
     @Test
     void contextLoads() {
+        System.out.println("AkaneApplicationTests contextLoads");
     }
 
 }

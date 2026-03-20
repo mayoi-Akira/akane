@@ -10,6 +10,10 @@ spring:
     url: jdbc:mysql://localhost:3306/akane?serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     username: root
     password:
+  sql:
+    init:
+      mode: always
+      platform: postgres
   ai:
     deepseek:
       api-key:

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bot.akane.mapper.GroupToolMapper">
+
+    <resultMap id="ToolsMap" type="com.bot.akane.model.entity.Tools">
+        <id property="toolCode" column="tool_code"/>
+        <result property="toolName" column="tool_name"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <select id="selectAllTools" resultMap="ToolsMap">
+        SELECT tool_code, tool_name, description
+        FROM tools
+        ORDER BY tool_code
+    </select>
+
+    <select id="selectEnabledToolsByGroupId" resultMap="ToolsMap">
+        SELECT d.tool_code, d.tool_name, d.description
+        FROM group_tool_mapping m
+                 JOIN tools d ON d.tool_code = m.tool_code
+        WHERE m.group_id = #{groupId}
+          AND m.is_enabled = TRUE
+        ORDER BY d.tool_code
+    </select>
+
+    <select id="selectToolByCode" resultMap="ToolsMap">
+        SELECT tool_code, tool_name, description
+        FROM tools
+        WHERE tool_code = #{toolCode}
+    </select>
+
+    <select id="selectExistingToolCodes" resultType="string">
+        SELECT tool_code
+        FROM tools
+        WHERE tool_code IN
+        <foreach collection="toolCodes" item="toolCode" open="(" separator="," close=")">
+            #{toolCode}
+        </foreach>
+    </select>
+
+    <insert id="insertGroupConfigIfAbsent">
+        INSERT IGNORE INTO `group` (group_id)
+        VALUES (#{groupId})
+    </insert>
+
+    <insert id="insertToolIfAbsent">
+        INSERT IGNORE INTO tools (tool_code, tool_name, description)
+        VALUES (#{tool.toolCode}, #{tool.toolName}, #{tool.description})
+    </insert>
+
+    <update id="disableMappingsByGroupId">
+        UPDATE group_tool_mapping
+        SET is_enabled = FALSE
+        WHERE group_id = #{groupId}
+    </update>
+
+    <insert id="upsertGroupToolMapping">
+        INSERT INTO group_tool_mapping (group_id, tool_code, is_enabled)
+        VALUES (#{groupId}, #{toolCode}, #{isEnabled})
+        ON DUPLICATE KEY UPDATE is_enabled = VALUES(is_enabled)
+    </insert>
+
+    <update id="enableMappingsByGroupId">
+        UPDATE group_tool_mapping
+        SET is_enabled = TRUE
+        WHERE group_id = #{groupId}
+    </update>
+
+    <insert id="enableAllToolsForGroup">
+        INSERT IGNORE INTO group_tool_mapping (group_id, tool_code, is_enabled)
+        SELECT #{groupId}, t.tool_code, TRUE
+        FROM tools t
+    </insert>
+
+    <update id="enableAllMappingsForAllGroups">
+        UPDATE group_tool_mapping
+        SET is_enabled = TRUE
+    </update>
+
+    <insert id="enableAllToolsForAllGroups">
+        INSERT IGNORE INTO group_tool_mapping (group_id, tool_code, is_enabled)
+        SELECT g.group_id, t.tool_code, TRUE
+        FROM `group` g
+        CROSS JOIN tools t
+    </insert>
+
+</mapper>
