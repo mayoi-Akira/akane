@@ -10,7 +10,7 @@ public interface WeatherService {
      * @param days 查询未来几天的天气
      * @return 包含天气信息的字符串"
      */
-    public String getWeatherForDays(String cityName, String adm, int days);
+    public String getWeatherForDays(String cityName, String adm, Integer days);
 
     /**
      * 获取指定城市未来几小时的天气信息
@@ -20,5 +20,5 @@ public interface WeatherService {
      * @param hours 查询未来几小时的天气
      * @return 包含天气信息的字符串"
      */
-    public String getWeatherForHours(String cityName, String adm, int hours);
+    public String getWeatherForHours(String cityName, String adm, Integer hours);
 }

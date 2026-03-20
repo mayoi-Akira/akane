@@ -1,6 +1,6 @@
 package com.bot.akane.agent.tools;
 
-public interface Tool {
+public interface ToolInterface {
     String getName();
     String getDescription();
     ToolType getType();

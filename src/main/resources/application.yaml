@@ -27,3 +27,7 @@ weather:
   api-key:
   api-host:
 DEFAULT_MAX_MESSAGES:
+mybatis:
+  type-aliases-package: com.bot.akane.model.entity
+  mapper-locations: classpath:mapper/*.xml
+  type-handlers-package: com.bot.akane.typehandler

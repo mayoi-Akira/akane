@@ -1,9 +1,12 @@
 package com.bot.akane.agent.examples;
 
+import java.util.List;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -99,5 +102,31 @@ public class AgentV1 {
         }finally {
             this.agentState = AgentState.IDLE;
         }
+    }
+
+      /**
+     * 获取当前对话历史
+     */
+    public List<Message> getConversationHistory() {
+        return chatMemory.get(sessionId);
+    }
+    
+    /**
+     * 重置对话历史
+     */
+    public void reset() {
+        chatMemory.clear(sessionId);
+        if (StringUtils.hasLength(systemPrompt)) {
+            chatMemory.add(sessionId, new SystemMessage(systemPrompt));
+        }
+        agentState = AgentState.IDLE;
+    }
+    
+    @Override
+    public String toString() {
+        return "JChatMindV1 {" +
+                "name = " + name + ",\n" +
+                "description = " + description + ",\n" +
+                "systemPrompt = " + systemPrompt + "}";
     }
 }

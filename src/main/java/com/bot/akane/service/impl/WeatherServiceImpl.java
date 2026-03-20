@@ -25,12 +25,12 @@ public class WeatherServiceImpl implements WeatherService {
     @Value("${weather.api-key}")
     private String apiKey;
     
-    private String getDayParam(int day){
+    private String getDayParam(Integer day){
         if(day <= 3) return "3d";
         return "7d";
     }
 
-    private String getWeatherData(String cityName, String adm, String timeFrame, int length) {
+    private String getWeatherData(String cityName, String adm, String timeFrame, Integer length) {
         String location = cityLocationService.getCityLocation(cityName, adm);
         if (location == null || location.isEmpty()) {
             return "无法获取城市的经纬度信息，请检查城市名称和上级名称是否正确。";
@@ -65,14 +65,14 @@ public class WeatherServiceImpl implements WeatherService {
         
     }
     @Override
-    public String getWeatherForDays(String cityName, String adm, int days) {
+    public String getWeatherForDays(String cityName, String adm, Integer days) {
         if(days <= 0 || days > 7){
             return "只允许查询1到7天的天气。";
         }
         return getWeatherData(cityName, adm, getDayParam(days), days);
     }
     @Override
-    public String getWeatherForHours(String cityName, String adm, int hours) {
+    public String getWeatherForHours(String cityName, String adm, Integer hours) {
         if(hours <= 0 || hours > 24){
             return "只允许查询1到24小时内的天气。";
         }

@@ -24,7 +24,10 @@ public class CityLocationServiceImpl implements CityLocationService {
         // System.out.println(apiKey);
 
         String location = URLUtil.encode(cityName);
-        String admParam = adm != null ? URLUtil.encode(adm) : "";
+        String admParam = "";
+        if(adm != null && !adm.trim().isEmpty()){
+            admParam = URLUtil.encode(adm);
+        }
         String url = apiHost + "/geo/v2/city/lookup?location=" + location + "&adm=" + admParam;
 
         try {
