@@ -20,7 +20,9 @@ import com.bot.akane.agent.tools.ToolInterface;
 import com.bot.akane.service.GroupToolService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AgentManager {
@@ -32,7 +34,7 @@ public class AgentManager {
     @Qualifier("deepseek-chat")
     private ChatClient chatClient;
 
-    @Value("${system-prompt: 你是一个AI助手，现在处于QQ聊天环境，请根据内容调用合适的工具并作出合适的回答。}")
+    @Value("${Agent.system-prompt}")
     private String systemPrompt;
 
     @Value("${agent.name:akane}")
@@ -46,6 +48,7 @@ public class AgentManager {
     private static final Duration GROUP_CHAT_LOCK_TTL = Duration.ofMinutes(5);
     
     public String chat(String groupId, String userInput) {
+        log.info(systemPrompt);
         String lockKey = GROUP_CHAT_LOCK_KEY_PREFIX + groupId;
         Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", GROUP_CHAT_LOCK_TTL);
         if (!Boolean.TRUE.equals(lockAcquired)) {

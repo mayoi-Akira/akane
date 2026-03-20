@@ -15,6 +15,8 @@ import org.springframework.ai.model.tool.DefaultToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.model.tool.ToolExecutionResult;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.bot.akane.agent.AgentState;
@@ -91,10 +93,11 @@ public class AgentV2 extends AgentV1 {
                 2. 如果缺少必要信息，必须主动调用相应的工具获取，不要询问用户
                 3. 只有在真正完成用户的完整请求后，才能给出最终回复
                 4. 优先使用工具获取信息，而不是询问用户
-    
-                请根据当前对话上下文，决定下一步动作：如果需要调用工具来完成任务，请调用相应的工具。
-                """;
+                5. 请注意某些工具的参数是可以为空的，不需要再次向用户询问
 
+                请根据当前对话上下文，决定下一步动作：如果需要调用工具来完成任务，请调用相应的工具。
+
+                """;
         Prompt prompt = Prompt.builder()
                         .messages(this.chatMemory.get(sessionId))
                         .chatOptions(this.chatOptions)
