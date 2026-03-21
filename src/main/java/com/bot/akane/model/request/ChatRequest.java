@@ -1,4 +1,4 @@
-package com.bot.akane.request;
+package com.bot.akane.model.request;
 
 public class ChatRequest {
     private String groupId;

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.bot.akane.model.entity.Tools;
+import com.bot.akane.model.entity.GroupToolMapping;
 
 @Mapper
 public interface GroupToolMapper {
@@ -33,7 +34,5 @@ public interface GroupToolMapper {
 
     int enableAllToolsForGroup(@Param("groupId") String groupId);
 
-    // int enableAllMappingsForAllGroups();
-
-    // int enableAllToolsForAllGroups();
+    List<GroupToolMapping> selectGroupToolMappingsByGroupId(@Param("groupId") String groupId);
 }

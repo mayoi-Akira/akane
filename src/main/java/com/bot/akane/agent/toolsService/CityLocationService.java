@@ -1,4 +1,4 @@
-package com.bot.akane.service;
+package com.bot.akane.agent.toolsService;
 
 public interface CityLocationService {
     

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.stereotype.Component;
 
 import com.bot.akane.agent.examples.AgentV2;
 

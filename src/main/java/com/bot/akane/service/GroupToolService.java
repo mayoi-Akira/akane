@@ -2,6 +2,8 @@ package com.bot.akane.service;
 
 import java.util.List;
 
+import com.bot.akane.model.entity.GroupToolMapping;
+
 public interface GroupToolService {
     /**
      * 获取全部可用的工具列表
@@ -30,4 +32,11 @@ public interface GroupToolService {
      * @return 更新结果的字符串，包含成功或失败的信息
      */
     String updateToolsForGroup(String groupId, String[] toolNames);
+
+    /**
+     * 获取指定群聊的所有工具映射信息
+     * @param groupId 群聊ID
+     * @return 工具映射列表
+     */
+    List<GroupToolMapping> getGroupToolMappings(String groupId);
 }

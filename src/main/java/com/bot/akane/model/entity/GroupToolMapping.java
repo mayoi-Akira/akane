@@ -3,9 +3,10 @@ package com.bot.akane.model.entity;
 import lombok.Data;
 
 @Data
-public class Tools {
+public class GroupToolMapping {
+    private Integer id;
     private Integer toolId;
-    private String toolCode;
     private String toolName;
-    private String description;
+    private String toolDesc;
+    private Boolean isEnabled;
 }

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bot.akane.mapper.GroupToolMapper;
 import com.bot.akane.model.entity.Tools;
+import com.bot.akane.model.entity.GroupToolMapping;
 import com.bot.akane.service.GroupToolService;
 
 import lombok.RequiredArgsConstructor;
@@ -120,6 +121,15 @@ public class GroupToolServiceImpl implements GroupToolService {
 				groupToolMapper.upsertGroupToolMapping(cleanGroupId, toolCode, true));
 
 		return "群 " + cleanGroupId + " 工具更新成功，已启用: " + String.join(", ", normalizedToolCodes);
+	}
+
+	@Override
+	public List<GroupToolMapping> getGroupToolMappings(String groupId) {
+		if (groupId == null || groupId.trim().isEmpty()) {
+			log.warn("群聊ID不能为空。");
+			return List.of();
+		}
+		return groupToolMapper.selectGroupToolMappingsByGroupId(groupId.trim());
 	}
 
 	private String formatToolLine(Tools tool) {

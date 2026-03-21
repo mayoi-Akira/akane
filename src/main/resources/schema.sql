@@ -8,16 +8,17 @@ CREATE TABLE IF NOT EXISTS `group` (
 
 -- 2. 工具定义表
 CREATE TABLE IF NOT EXISTS tools (
-    tool_code VARCHAR(100) PRIMARY KEY, -- 对应代码里的 getName()
+    tool_id INT AUTO_INCREMENT PRIMARY KEY,
+    tool_code VARCHAR(100) NOT NULL UNIQUE, -- 对应代码里的 getName()
     tool_name VARCHAR(100) NOT NULL,
     description TEXT
 );
 
 -- 3. 群组-工具关联表
 CREATE TABLE IF NOT EXISTS group_tool_mapping (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     group_id VARCHAR(255) REFERENCES `group`(group_id),
-    tool_code VARCHAR(100) REFERENCES tools(tool_code),
+    tool_id INT REFERENCES tools(tool_id),
     is_enabled BOOLEAN DEFAULT TRUE,
-    UNIQUE(group_id, tool_code)
+    UNIQUE(group_id, tool_id)
 );

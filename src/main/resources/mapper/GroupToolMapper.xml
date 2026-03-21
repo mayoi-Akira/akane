@@ -5,28 +5,29 @@
 <mapper namespace="com.bot.akane.mapper.GroupToolMapper">
 
     <resultMap id="ToolsMap" type="com.bot.akane.model.entity.Tools">
-        <id property="toolCode" column="tool_code"/>
+        <id property="toolId" column="tool_id"/>
+        <result property="toolCode" column="tool_code"/>
         <result property="toolName" column="tool_name"/>
         <result property="description" column="description"/>
     </resultMap>
 
     <select id="selectAllTools" resultMap="ToolsMap">
-        SELECT tool_code, tool_name, description
+        SELECT tool_id, tool_code, tool_name, description
         FROM tools
         ORDER BY tool_code
     </select>
 
     <select id="selectEnabledToolsByGroupId" resultMap="ToolsMap">
-        SELECT d.tool_code, d.tool_name, d.description
+        SELECT d.tool_id, d.tool_code, d.tool_name, d.description
         FROM group_tool_mapping m
-                 JOIN tools d ON d.tool_code = m.tool_code
+                 JOIN tools d ON d.tool_id = m.tool_id
         WHERE m.group_id = #{groupId}
           AND m.is_enabled = TRUE
         ORDER BY d.tool_code
     </select>
 
     <select id="selectToolByCode" resultMap="ToolsMap">
-        SELECT tool_code, tool_name, description
+        SELECT tool_id, tool_code, tool_name, description
         FROM tools
         WHERE tool_code = #{toolCode}
     </select>
@@ -57,8 +58,10 @@
     </update>
 
     <insert id="upsertGroupToolMapping">
-        INSERT INTO group_tool_mapping (group_id, tool_code, is_enabled)
-        VALUES (#{groupId}, #{toolCode}, #{isEnabled})
+        INSERT INTO group_tool_mapping (group_id, tool_id, is_enabled)
+        SELECT #{groupId}, t.tool_id, #{isEnabled}
+        FROM tools t
+        WHERE t.tool_code = #{toolCode}
         ON DUPLICATE KEY UPDATE is_enabled = VALUES(is_enabled)
     </insert>
 
@@ -69,21 +72,17 @@
     </update>
 
     <insert id="enableAllToolsForGroup">
-        INSERT IGNORE INTO group_tool_mapping (group_id, tool_code, is_enabled)
-        SELECT #{groupId}, t.tool_code, TRUE
+        INSERT IGNORE INTO group_tool_mapping (group_id, tool_id, is_enabled)
+        SELECT #{groupId}, t.tool_id, TRUE
         FROM tools t
     </insert>
 
-    <!-- <update id="enableAllMappingsForAllGroups">
-        UPDATE group_tool_mapping
-        SET is_enabled = TRUE
-    </update>
-
-    <insert id="enableAllToolsForAllGroups">
-        INSERT IGNORE INTO group_tool_mapping (group_id, tool_code, is_enabled)
-        SELECT g.group_id, t.tool_code, TRUE
-        FROM `group` g
-        CROSS JOIN tools t
-    </insert> -->
+    <select id="selectGroupToolMappingsByGroupId" resultType="com.bot.akane.model.entity.GroupToolMapping">
+        SELECT m.id, m.tool_id as toolId, m.is_enabled as isEnabled, t.tool_name as toolName, t.description as toolDesc
+        FROM group_tool_mapping m
+        JOIN tools t ON m.tool_id = t.tool_id
+        WHERE m.group_id = #{groupId}
+        ORDER BY m.id
+    </select>
 
 </mapper>

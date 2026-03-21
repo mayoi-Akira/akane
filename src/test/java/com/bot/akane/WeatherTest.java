@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bot.akane.service.CityLocationService;
-import com.bot.akane.service.WeatherService;
+import com.bot.akane.agent.toolsService.CityLocationService;
+import com.bot.akane.agent.toolsService.WeatherService;
 
 @SpringBootTest
 public class WeatherTest {

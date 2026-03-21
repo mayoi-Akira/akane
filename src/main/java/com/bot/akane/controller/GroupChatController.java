@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bot.akane.model.request.ChatRequest;
 import com.bot.akane.model.response.ApiResponse;
-import com.bot.akane.request.ChatRequest;
 import com.bot.akane.service.GroupChatService;
 
 import lombok.RequiredArgsConstructor;
