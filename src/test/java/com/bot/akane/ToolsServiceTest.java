@@ -5,14 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.bot.akane.agent.toolsService.CityLocationService;
+import com.bot.akane.agent.toolsService.EmailService;
 import com.bot.akane.agent.toolsService.WeatherService;
 
 @SpringBootTest
-public class WeatherTest {
+public class ToolsServiceTest {
     @Autowired
     private CityLocationService cityLocationService;
     @Autowired
     private WeatherService weatherService;
+    @Autowired
+    private EmailService emailService;
 
     @Test
     public void testGetCityLocation() {
@@ -39,4 +42,16 @@ public class WeatherTest {
         String weatherInfo = weatherService.getWeatherForHours(cityName, adm, 2);
         System.out.println("未来2小时的天气信息: " + weatherInfo);
     }
+
+    @Test
+    public void testEmailTool() {
+        String to = "akane36@163.com";
+        String subject = "测试邮件";
+        String content = "这是一封测试邮件，测试异步发送功能。";
+
+        emailService.sendEmailAsync(to, subject, content);
+        System.out.println("邮件发送请求已提交，实际发送在后台异步执行中...");
+
+    }
+        
 }

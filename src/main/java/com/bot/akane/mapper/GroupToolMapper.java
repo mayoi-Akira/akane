@@ -35,4 +35,6 @@ public interface GroupToolMapper {
     int enableAllToolsForGroup(@Param("groupId") String groupId);
 
     List<GroupToolMapping> selectGroupToolMappingsByGroupId(@Param("groupId") String groupId);
+
+    List<String> selectAllGroupIds();
 }

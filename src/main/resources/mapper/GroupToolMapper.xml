@@ -46,7 +46,7 @@
         VALUES (#{groupId})
     </insert>
 
-    <insert id="insertToolIfAbsent">
+    <insert id="insertToolIfAbsent" useGeneratedKeys="true" keyProperty="toolId">
         INSERT IGNORE INTO tools (tool_code, tool_name, description)
         VALUES (#{tool.toolCode}, #{tool.toolName}, #{tool.description})
     </insert>
@@ -83,6 +83,11 @@
         JOIN tools t ON m.tool_id = t.tool_id
         WHERE m.group_id = #{groupId}
         ORDER BY m.id
+    </select>
+
+    <select id="selectAllGroupIds" resultType="string">
+        SELECT DISTINCT group_id
+        FROM `group`
     </select>
 
 </mapper>

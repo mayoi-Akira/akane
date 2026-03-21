@@ -18,8 +18,8 @@ public class DateTimeTool implements ToolInterface {
     }
 
     @Override
-    public ToolType getType() {
-        return ToolType.FIXED;
+    public ToolDefaultType getType() {
+        return ToolDefaultType.ENABLE;
     }
 
     @Tool(name = "getCurrentDate", description = "获取当前日期，格式为yyyy-MM-dd")

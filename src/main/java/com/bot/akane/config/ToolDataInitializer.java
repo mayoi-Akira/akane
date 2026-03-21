@@ -1,5 +1,6 @@
 package com.bot.akane.config;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.ApplicationArguments;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bot.akane.agent.tools.ToolInterface;
+import com.bot.akane.agent.tools.ToolDefaultType;
 import com.bot.akane.mapper.GroupToolMapper;
 import com.bot.akane.model.entity.Tools;
 
@@ -32,15 +34,17 @@ public class ToolDataInitializer implements ApplicationRunner {
             return;
         }
 
+        // 第一步：更新所有工具列表
+        Map<String, Tools> toolMap = new java.util.HashMap<>();
         for (ToolInterface toolBean : toolBeans.values()) {
             Tools tool = new Tools();
             tool.setToolCode(toolBean.getName());
             tool.setToolName(toolBean.getName());
             tool.setDescription(toolBean.getDescription());
             groupToolMapper.insertToolIfAbsent(tool);
+            toolMap.put(toolBean.getName(), tool);
         }
+        log.info("工具列表更新完成，工具数量: {}", toolBeans.size());
 
-
-        log.info("工具初始化完成，工具数量: {}", toolBeans.size());
     }
 }

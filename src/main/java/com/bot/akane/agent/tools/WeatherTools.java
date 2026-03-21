@@ -26,8 +26,8 @@ public class WeatherTools implements ToolInterface {
     }
 
     @Override
-    public ToolType getType() {
-        return ToolType.FIXED;
+    public ToolDefaultType getType() {
+        return ToolDefaultType.ENABLE;
     }
 
     @Tool(name = "getWeatherForDays", description = "获取指定城市未来几天的天气信息，参数分别为城市名称、上级城市名称（可为空）和未来天数")
