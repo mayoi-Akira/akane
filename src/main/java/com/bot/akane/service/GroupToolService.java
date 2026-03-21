@@ -22,9 +22,10 @@ public interface GroupToolService {
      * 更新指定群聊的工具列表
      * @param groupId 群聊ID
      * @param toolNames 工具名称列表
+     * @param toEnable 是否启用这些工具（true表示启用，false表示禁用）
      * @return 更新结果的字符串，包含成功或失败的信息
      */
-    String updateToolsForGroup(String groupId, String[] toolNames);
+    String updateToolsForGroup(String groupId, String[] toolNames, Boolean toEnable);
 
     /**
      * 获取指定群聊的所有工具配置信息

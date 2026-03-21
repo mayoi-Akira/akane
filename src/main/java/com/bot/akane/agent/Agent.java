@@ -35,10 +35,25 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Agent implements AgentInterface {
+    private static final String DEFAULT_THINK_PROMPT = """
+            你是一个智能的决策模块，负责完成用户请求。
+            核心原则：
+            1. 先判断是否可以直接回答，能直接回答就不要调用工具
+            2. 只有在确实需要外部实时信息、执行操作或精确计算时才调用工具
+            3. 缺少必要参数时先追问用户，不要猜测参数
+            4. 严格只调用已提供的工具，不要编造工具名
+            5. 任务完成后给出简洁自然语言总结
+
+            请根据当前对话上下文决定下一步动作：
+            - 需要工具时再调用工具
+            - 不需要工具时直接输出自然语言回复
+            """;
+
     // 基础属性
     private String name;
     private String description;
     private String systemPrompt;
+    private String thinkPrompt;
     private ChatClient chatClient;
     private String sessionId;
     
@@ -62,6 +77,7 @@ public class Agent implements AgentInterface {
     public Agent(String name,
                  String description,
                  String systemPrompt,
+                 String thinkPrompt,
                  ChatClient chatClient,
                  Integer maxMessages,
                  Integer maxSteps,
@@ -70,6 +86,7 @@ public class Agent implements AgentInterface {
         this.name = name;
         this.description = description;
         this.systemPrompt = systemPrompt;
+        this.thinkPrompt = StringUtils.hasLength(thinkPrompt) ? thinkPrompt : DEFAULT_THINK_PROMPT;
         this.chatClient = chatClient;
         this.sessionId = sessionId != null ? sessionId : "default-session";
         this.maxSteps = maxSteps != null ? maxSteps : 20;
@@ -160,18 +177,6 @@ public class Agent implements AgentInterface {
      * 思考阶段：决定是否需要调用工具
      */
     private Boolean think() {
-        String thinkPrompt = """
-                你是一个智能的决策模块，负责完成用户的完整请求。
-                核心原则：
-                1. 仔细分析用户的原始请求，确保完成所有要求
-                2. 如果缺少必要信息，必须主动调用相应的工具获取，不要询问用户
-                3. 只有在真正完成用户的完整请求后，才能给出最终回复
-                4. 优先使用工具获取信息，而不是询问用户
-                5. 请注意某些工具的参数是可以为空的，不需要再次向用户询问
-
-                请根据当前对话上下文，决定下一步动作：如果需要调用工具来完成任务，请调用相应的工具。
-                """;
-        
         Prompt prompt = Prompt.builder()
                 .messages(buildFullMessages())
                 .chatOptions(this.chatOptions)
@@ -179,7 +184,7 @@ public class Agent implements AgentInterface {
         
         this.lastChatResponse = chatClient
                 .prompt(prompt)
-                .system(thinkPrompt)
+            .system(this.thinkPrompt)
                 .toolCallbacks(availableTools != null ? availableTools.toArray(new ToolCallback[0]) : new ToolCallback[0])
                 .call()
                 .chatClientResponse()

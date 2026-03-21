@@ -39,6 +39,9 @@ public class AgentManager {
     @Value("${Agent.system-prompt}")
     private String systemPrompt;
 
+    @Value("${Agent.think-prompt:}")
+    private String thinkPrompt;
+
     @Value("${agent.name:akane}")
     private String agentName;
 
@@ -76,6 +79,20 @@ public class AgentManager {
         }
     }
 
+    public String resetAgent(String groupId) {
+        String lockKey = GROUP_CHAT_LOCK_KEY_PREFIX + groupId;
+        Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", GROUP_CHAT_LOCK_TTL);
+        if (!Boolean.TRUE.equals(lockAcquired)) {
+            log.warn("Failed to acquire lock for groupId: {}", groupId);
+            return "akane 还在思考中，请稍后再试...";
+        }
+        log.info("Resetting agent for groupId: {}", groupId);
+        // agentCache.get(groupId).reset();
+        redisTemplate.delete(lockKey);
+        agentCache.remove(groupId);
+        return "你是谁...？";
+    }
+
     private Agent createNewAgent(String groupId) {
         log.debug("Creating new agent for groupId: {}", groupId);
         List<String> enabledToolCodes = groupToolService.getToolsForGroup(groupId);
@@ -98,6 +115,7 @@ public class AgentManager {
                 agentName + "-" + groupId,
                 "Agent for Group " + groupId,
                 systemPrompt,
+            thinkPrompt,
                 chatClient,
                 10,
                 20,
@@ -107,4 +125,6 @@ public class AgentManager {
         log.info("Agent created successfully for groupId: {}, agentName: {}", groupId, agent.getName());
         return agent;
     }
+
+    
 }

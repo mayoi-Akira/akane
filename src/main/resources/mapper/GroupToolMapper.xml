@@ -78,7 +78,9 @@
     <insert id="upsertGroupToolConfig">
         INSERT INTO group_tool_config (group_id, tool_code, status)
         VALUES (#{groupId}, #{toolCode}, #{status})
-        ON DUPLICATE KEY UPDATE status = VALUES(status), updated_at = CURRENT_TIMESTAMP
+        ON DUPLICATE KEY UPDATE 
+        status = IF(status = 'FORCE', status, VALUES(status)),
+        updated_at = IF(status = 'FORCE', updated_at, CURRENT_TIMESTAMP);
     </insert>
 
     <!-- 系统启动时关联群组所有工具 -->

@@ -35,6 +35,9 @@ public class AgentTest {
     @Value("${Agent.system-prompt}")
     private String prompt;
 
+    @Value("${Agent.think-prompt:}")
+    private String thinkPrompt;
+
     @Test
     public void testAgentV2() {
         String userInput = "给akane36@163.com发一封邮件，内容是大连市金州区明天的天气预报。";
@@ -46,6 +49,7 @@ public class AgentTest {
                 "test-agent-v2",
                 "测试",
                 prompt,
+            thinkPrompt,
                 chatClient,
                 20,
                 20,

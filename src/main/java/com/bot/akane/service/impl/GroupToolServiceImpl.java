@@ -64,23 +64,23 @@ public class GroupToolServiceImpl implements GroupToolService {
 				.map(this::formatToolLine)
 				.collect(Collectors.joining("\n"));
 		log.info("群 " + cleanGroupId + " 的启用工具:\n" + details);
-		return tools.stream().map(Tool::getToolCode).toList();
+		return tools.stream().map(Tool::getToolName).toList();
 	}
 
 	@Override
 	@Transactional
-	public String updateToolsForGroup(String groupId, String[] toolNames) {
+	public String updateToolsForGroup(String groupId, String[] toolCodes, Boolean toEnable) {
 		if (groupId == null || groupId.trim().isEmpty()) {
 			return "群聊ID不能为空。";
 		}
 		String cleanGroupId = groupId.trim();
 
-		if (toolNames == null || toolNames.length == 0) {
+		if (toolCodes == null || toolCodes.length == 0) {
 			return "工具列表不能为空。";
 		}
 
-		List<String> normalizedToolCodes = Arrays.stream(toolNames)
-				.filter(name -> name != null && !name.trim().isEmpty())
+		List<String> normalizedToolCodes = Arrays.stream(toolCodes)
+				.filter(code -> code != null && !code.trim().isEmpty())
 				.map(String::trim)
 				.distinct()
 				.toList();
@@ -99,11 +99,12 @@ public class GroupToolServiceImpl implements GroupToolService {
 		}
 
 		groupToolMapper.insertGroupIfAbsent(cleanGroupId);
-		groupToolMapper.disableAllToolsForGroup(cleanGroupId);
+		// groupToolMapper.disableAllToolsForGroup(cleanGroupId);
+		log.info(normalizedToolCodes.toString());
 		normalizedToolCodes.forEach(toolCode ->
-				groupToolMapper.upsertGroupToolConfig(cleanGroupId, toolCode, ToolType.ENABLE));
+				groupToolMapper.upsertGroupToolConfig(cleanGroupId, toolCode, toEnable ? ToolType.ENABLE : ToolType.DISABLE));
 
-		return "群 " + cleanGroupId + " 工具更新成功，已启用: " + String.join(", ", normalizedToolCodes);
+		return "工具更新成功，已" + (toEnable ? "启用" : "禁用") + ": " + String.join(", ", normalizedToolCodes) + "请重置Agent以应用更新";
 	}
 
 	@Override
