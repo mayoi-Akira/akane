@@ -2,6 +2,9 @@ package com.bot.akane.agent.tools;
 
 import org.springframework.ai.tool.annotation.Tool;
 
+import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolInterface;
+
 public class DirectAnswerTool implements ToolInterface {
 
     @Override

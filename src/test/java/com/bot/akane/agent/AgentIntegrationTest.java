@@ -98,7 +98,7 @@ public class AgentIntegrationTest {
 
     @Test
     public void testAgentInterface() {
-        assertTrue(agent instanceof IAgent);
+        assertTrue(agent instanceof AgentInterface);
         
         // Test interface methods
         assertNotNull(agent.getName());

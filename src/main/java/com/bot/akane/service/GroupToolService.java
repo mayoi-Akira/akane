@@ -19,13 +19,6 @@ public interface GroupToolService {
     List<String> getToolsForGroup(String groupId);
 
     /**
-    * 获取指定工具的详细信息
-    * @param toolName 工具名称
-    * @return 包含工具详细信息的字符串，包括名称、描述和使用方法
-    */
-    String getToolDetails(String toolName);
-
-    /**
      * 更新指定群聊的工具列表
      * @param groupId 群聊ID
      * @param toolNames 工具名称列表

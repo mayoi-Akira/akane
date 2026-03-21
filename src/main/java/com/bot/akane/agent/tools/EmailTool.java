@@ -3,6 +3,8 @@ package com.bot.akane.agent.tools;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
+import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolInterface;
 import com.bot.akane.agent.toolsService.EmailService;
 
 import lombok.RequiredArgsConstructor;

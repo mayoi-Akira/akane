@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.bot.akane.agent.tools.ToolDefaultType;
 import com.bot.akane.model.entity.Tools;
+import com.bot.akane.agent.toolSettings.ToolDefaultType;
 import com.bot.akane.model.entity.GroupToolMapping;
 
 @Mapper

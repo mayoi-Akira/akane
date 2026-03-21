@@ -8,7 +8,7 @@ import org.springframework.ai.chat.messages.Message;
  * Agent 接口
  * 定义 Agent 的核心行为契约
  */
-public interface IAgent {
+public interface AgentInterface {
     /**
      * 执行聊天
      * @param userInput 用户输入

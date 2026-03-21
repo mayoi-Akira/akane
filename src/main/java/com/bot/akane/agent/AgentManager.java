@@ -16,7 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.bot.akane.agent.tools.ToolInterface;
+import com.bot.akane.agent.toolSettings.ToolInterface;
 import com.bot.akane.exception.AgentException;
 import com.bot.akane.service.GroupToolService;
 import com.bot.akane.util.TraceIdUtil;

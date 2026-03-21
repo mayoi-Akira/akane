@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  * 支持 ReAct 循环：Reasoning -> Acting -> Observing
  */
 @Slf4j
-public class Agent implements IAgent {
+public class Agent implements AgentInterface {
     // 基础属性
     private String name;
     private String description;

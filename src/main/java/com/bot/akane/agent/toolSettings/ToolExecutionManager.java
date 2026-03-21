@@ -1,4 +1,4 @@
-package com.bot.akane.agent.tools;
+package com.bot.akane.agent.toolSettings;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;

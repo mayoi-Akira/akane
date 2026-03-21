@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bot.akane.agent.tools.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolDefaultType;
 import com.bot.akane.mapper.GroupToolMapper;
 import com.bot.akane.model.entity.Tools;
 import com.bot.akane.model.entity.GroupToolMapping;
@@ -66,23 +66,6 @@ public class GroupToolServiceImpl implements GroupToolService {
 				.collect(Collectors.joining("\n"));
 		log.info("群 " + cleanGroupId + " 的启用工具:\n" + details);
 		return tools.stream().map(Tools::getToolCode).toList();
-	}
-
-	@Override
-	public String getToolDetails(String toolName) {
-		if (toolName == null || toolName.trim().isEmpty()) {
-			return "工具名称不能为空。";
-		}
-
-		Tools tool = groupToolMapper.selectToolByCode(toolName.trim());
-		if (tool == null) {
-			return "未找到工具: " + toolName;
-		}
-
-		return "工具详情:\n"
-				+ "toolCode: " + tool.getToolCode() + "\n"
-				+ "toolName: " + nullToEmpty(tool.getToolName()) + "\n"
-				+ "description: " + nullToEmpty(tool.getDescription());
 	}
 
 	@Override

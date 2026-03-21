@@ -9,8 +9,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bot.akane.agent.tools.ToolInterface;
-import com.bot.akane.agent.tools.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolInterface;
 import com.bot.akane.mapper.GroupToolMapper;
 import com.bot.akane.model.entity.Tools;
 

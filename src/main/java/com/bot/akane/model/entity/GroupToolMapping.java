@@ -1,6 +1,7 @@
 package com.bot.akane.model.entity;
 
-import com.bot.akane.agent.tools.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolDefaultType;
+
 import lombok.Data;
 
 @Data

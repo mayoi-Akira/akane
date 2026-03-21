@@ -4,8 +4,8 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.stereotype.Component;
 
-import com.bot.akane.agent.tools.ToolDefaultType;
-import com.bot.akane.agent.tools.ToolInterface;
+import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolInterface;
 
 import lombok.extern.slf4j.Slf4j;
 

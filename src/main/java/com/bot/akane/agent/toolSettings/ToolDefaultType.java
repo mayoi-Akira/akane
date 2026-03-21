@@ -1,4 +1,4 @@
-package com.bot.akane.agent.tools;
+package com.bot.akane.agent.toolSettings;
 
 /**
  * 工具的默认开启状态
