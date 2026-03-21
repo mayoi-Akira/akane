@@ -104,7 +104,7 @@ public class GroupToolServiceImpl implements GroupToolService {
 		normalizedToolCodes.forEach(toolCode ->
 				groupToolMapper.upsertGroupToolConfig(cleanGroupId, toolCode, toEnable ? ToolType.ENABLE : ToolType.DISABLE));
 
-		return "工具更新成功，已" + (toEnable ? "启用" : "禁用") + ": " + String.join(", ", normalizedToolCodes) + "请重置Agent以应用更新";
+		return "工具更新成功，已" + (toEnable ? "启用" : "禁用") + ": " + String.join(", ", normalizedToolCodes) + "。请重置Agent以应用更新";
 	}
 
 	@Override

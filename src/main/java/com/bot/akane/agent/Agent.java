@@ -167,6 +167,9 @@ public class Agent implements AgentInterface {
             // 有工具调用，执行工具
             stateManager.transitionTo(AgentState.EXECUTING);
             execute();
+            if (!stateManager.isInState(AgentState.FINISHED) && !stateManager.isInState(AgentState.ERROR)) {
+                stateManager.transitionTo(AgentState.THINKING);
+            }
         } else {
             // 没有工具调用，直接结束
             stateManager.transitionTo(AgentState.FINISHED);
