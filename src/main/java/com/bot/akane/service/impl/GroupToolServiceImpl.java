@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolType;
 import com.bot.akane.mapper.GroupToolMapper;
-import com.bot.akane.model.entity.Tools;
-import com.bot.akane.model.entity.GroupToolMapping;
+import com.bot.akane.model.entity.Tool;
+import com.bot.akane.model.entity.GroupToolConfig;
 import com.bot.akane.service.GroupToolService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class GroupToolServiceImpl implements GroupToolService {
 
 	@Override
 	public List<String> getAvailableTools() {
-		List<Tools> tools = groupToolMapper.selectAllTools();
+		List<Tool> tools = groupToolMapper.selectAllTools();
 		if (tools == null || tools.isEmpty()) {
 			log.info("暂无可用工具。");
 			return List.of();
@@ -36,7 +36,7 @@ public class GroupToolServiceImpl implements GroupToolService {
 				.map(this::formatToolLine)
 				.collect(Collectors.joining("\n"));
 		log.info("全部可用工具:\n{}", details);
-		return tools.stream().map(Tools::getToolCode).toList();
+		return tools.stream().map(Tool::getToolCode).toList();
 	}
 
 	@Override
@@ -48,10 +48,9 @@ public class GroupToolServiceImpl implements GroupToolService {
 		}
 		String cleanGroupId = groupId.trim();
 
-		List<Tools> tools = groupToolMapper.selectEnabledToolsByGroupId(cleanGroupId);
+		List<Tool> tools = groupToolMapper.selectEnabledToolsByGroupId(cleanGroupId);
 		if (tools == null || tools.isEmpty()) {
-			groupToolMapper.insertGroupConfigIfAbsent(cleanGroupId);
-			groupToolMapper.enableMappingsByGroupId(cleanGroupId);
+			groupToolMapper.insertGroupIfAbsent(cleanGroupId);
 			groupToolMapper.enableAllToolsForGroup(cleanGroupId);
 			tools = groupToolMapper.selectEnabledToolsByGroupId(cleanGroupId);
 		}
@@ -65,7 +64,7 @@ public class GroupToolServiceImpl implements GroupToolService {
 				.map(this::formatToolLine)
 				.collect(Collectors.joining("\n"));
 		log.info("群 " + cleanGroupId + " 的启用工具:\n" + details);
-		return tools.stream().map(Tools::getToolCode).toList();
+		return tools.stream().map(Tool::getToolCode).toList();
 	}
 
 	@Override
@@ -99,24 +98,24 @@ public class GroupToolServiceImpl implements GroupToolService {
 			return "以下工具不存在: " + String.join(", ", missingToolCodes);
 		}
 
-		groupToolMapper.insertGroupConfigIfAbsent(cleanGroupId);
-		groupToolMapper.disableMappingsByGroupId(cleanGroupId);
+		groupToolMapper.insertGroupIfAbsent(cleanGroupId);
+		groupToolMapper.disableAllToolsForGroup(cleanGroupId);
 		normalizedToolCodes.forEach(toolCode ->
-				groupToolMapper.upsertGroupToolMapping(cleanGroupId, toolCode, ToolDefaultType.ENABLE));
+				groupToolMapper.upsertGroupToolConfig(cleanGroupId, toolCode, ToolType.ENABLE));
 
 		return "群 " + cleanGroupId + " 工具更新成功，已启用: " + String.join(", ", normalizedToolCodes);
 	}
 
 	@Override
-	public List<GroupToolMapping> getGroupToolMappings(String groupId) {
+	public List<GroupToolConfig> getGroupToolMappings(String groupId) {
 		if (groupId == null || groupId.trim().isEmpty()) {
 			log.warn("群聊ID不能为空。");
 			return List.of();
 		}
-		return groupToolMapper.selectGroupToolMappingsByGroupId(groupId.trim());
+		return groupToolMapper.selectGroupToolConfigsByGroupId(groupId.trim());
 	}
 
-	private String formatToolLine(Tools tool) {
+	private String formatToolLine(Tool tool) {
 		return "- " + tool.getToolCode() + " (" + nullToEmpty(tool.getToolName()) + "): " + nullToEmpty(tool.getDescription());
 	}
 

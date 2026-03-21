@@ -9,10 +9,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolType;
 import com.bot.akane.agent.toolSettings.ToolInterface;
 import com.bot.akane.mapper.GroupToolMapper;
-import com.bot.akane.model.entity.Tools;
+import com.bot.akane.model.entity.Tool;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,31 +34,26 @@ public class ToolDataInitializer implements ApplicationRunner {
             return;
         }
 
-        // 第一步：更新所有工具列表
-        Map<String, ToolInterface> toolMap = new java.util.HashMap<>();
+        // 第一步：初始化所有工具到数据库
         for (ToolInterface toolBean : toolBeans.values()) {
-            Tools tool = new Tools();
-            tool.setToolCode(toolBean.getName());
+            Tool tool = new Tool();
+            tool.setToolCode(toolBean.getCode());
             tool.setToolName(toolBean.getName());
             tool.setDescription(toolBean.getDescription());
+            tool.setToolType(toolBean.getType());
             groupToolMapper.insertToolIfAbsent(tool);
-            toolMap.put(toolBean.getName(), toolBean);
         }
-        log.info("工具列表更新完成，工具数量: {}", toolBeans.size());
+        log.info("工具初始化完成，工具数量: {}", toolBeans.size());
 
-        // 第二步：为所有 group 添加不存在的 tool 映射
+        // 第二步：为所有群组配置工具映射
         List<String> allGroupIds = groupToolMapper.selectAllGroupIds();
         for (String groupId : allGroupIds) {
-            for (Map.Entry<String, ToolInterface> entry : toolMap.entrySet()) {
-                String toolCode = entry.getKey();
-                ToolInterface toolBean = entry.getValue();
-                
-                // 根据工具的 getType() 值设置启用状态
-                ToolDefaultType toolStatus = toolBean.getType();
-                groupToolMapper.upsertGroupToolMapping(groupId, toolCode, toolStatus);
+            for (ToolInterface toolBean : toolBeans.values()) {
+                String toolCode = toolBean.getCode();
+                ToolType toolStatus = toolBean.getType();
+                groupToolMapper.upsertGroupToolConfig(groupId, toolCode, toolStatus);
             }
         }
-        log.info("group_tool_mapping 映射更新完成");
-
+        log.info("群组工具配置初始化完成");
     }
 }

@@ -4,90 +4,110 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bot.akane.mapper.GroupToolMapper">
 
-    <resultMap id="ToolsMap" type="com.bot.akane.model.entity.Tools">
-        <id property="toolId" column="tool_id"/>
-        <result property="toolCode" column="tool_code"/>
+    <resultMap id="ToolResultMap" type="com.bot.akane.model.entity.Tool">
+        <id property="toolCode" column="tool_code"/>
         <result property="toolName" column="tool_name"/>
         <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
     </resultMap>
 
-    <select id="selectAllTools" resultMap="ToolsMap">
-        SELECT tool_id, tool_code, tool_name, description
-        FROM tools
+    <resultMap id="GroupToolConfigResultMap" type="com.bot.akane.model.entity.GroupToolConfig">
+        <result property="groupId" column="group_id"/>
+        <result property="toolCode" column="tool_code"/>
+        <result property="toolName" column="tool_name"/>
+        <result property="status" column="status"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 查询所有工具 -->
+    <select id="selectAllTools" resultMap="ToolResultMap">
+        SELECT tool_code, tool_name, description, created_at
+        FROM tool
         ORDER BY tool_code
     </select>
 
-    <select id="selectEnabledToolsByGroupId" resultMap="ToolsMap">
-        SELECT d.tool_id, d.tool_code, d.tool_name, d.description
-        FROM group_tool_mapping m
-                 JOIN tools d ON d.tool_id = m.tool_id
-        WHERE m.group_id = #{groupId}
-          AND m.is_enabled IN ('ENABLE', 'FORCE')
-        ORDER BY d.tool_code
+    <!-- 查询指定群组启用的工具 -->
+    <select id="selectEnabledToolsByGroupId" resultMap="ToolResultMap">
+        SELECT t.tool_code, t.tool_name, t.description, t.created_at
+        FROM group_tool_config gtc
+        JOIN tool t ON t.tool_code = gtc.tool_code
+        WHERE gtc.group_id = #{groupId}
+          AND gtc.status IN ('ENABLE', 'FORCE')
+        ORDER BY t.tool_code
     </select>
 
-    <select id="selectToolByCode" resultMap="ToolsMap">
-        SELECT tool_id, tool_code, tool_name, description
-        FROM tools
+    <!-- 根据工具代码查询工具 -->
+    <select id="selectToolByCode" resultMap="ToolResultMap">
+        SELECT tool_code, tool_name, description, created_at
+        FROM tool
         WHERE tool_code = #{toolCode}
     </select>
 
+    <!-- 批量查询存在的工具代码 -->
     <select id="selectExistingToolCodes" resultType="string">
         SELECT tool_code
-        FROM tools
+        FROM tool
         WHERE tool_code IN
         <foreach collection="toolCodes" item="toolCode" open="(" separator="," close=")">
             #{toolCode}
         </foreach>
     </select>
 
-    <insert id="insertGroupConfigIfAbsent">
-        INSERT IGNORE INTO `group` (group_id)
+    <!-- 创建群聊配置（如果不存在） -->
+    <insert id="insertGroupIfAbsent">
+        INSERT IGNORE INTO chat_group (group_id)
         VALUES (#{groupId})
     </insert>
 
-    <insert id="insertToolIfAbsent" useGeneratedKeys="true" keyProperty="toolId">
-        INSERT IGNORE INTO tools (tool_code, tool_name, description)
-        VALUES (#{tool.toolCode}, #{tool.toolName}, #{tool.description})
+    <!-- 创建工具（如果不存在） -->
+    <insert id="insertToolIfAbsent">
+        INSERT IGNORE INTO tool (tool_code, tool_name, description, tool_default_type)
+        VALUES (#{tool.toolCode}, #{tool.toolName}, #{tool.description}, #{tool.toolType})
     </insert>
 
-    <update id="disableMappingsByGroupId">
-        UPDATE group_tool_mapping
-        SET is_enabled = 'DISABLE'
-        WHERE group_id = #{groupId}
+    <!-- 禁用群组的所有工具 -->
+    <update id="disableAllToolsForGroup">
+        UPDATE group_tool_config
+        SET status = 'DISABLE'
+        WHERE group_id = #{groupId} AND status != 'FORCE'
     </update>
 
-    <insert id="upsertGroupToolMapping">
-        INSERT INTO group_tool_mapping (group_id, tool_id, is_enabled)
-        SELECT #{groupId}, t.tool_id, #{isEnabled}
-        FROM tools t
-        WHERE t.tool_code = #{toolCode}
-        ON DUPLICATE KEY UPDATE is_enabled = VALUES(is_enabled)
+    <!-- 创建或更新群组-工具配置 -->
+    <insert id="upsertGroupToolConfig">
+        INSERT INTO group_tool_config (group_id, tool_code, status)
+        VALUES (#{groupId}, #{toolCode}, #{status})
+        ON DUPLICATE KEY UPDATE status = VALUES(status), updated_at = CURRENT_TIMESTAMP
     </insert>
 
-    <update id="enableMappingsByGroupId">
-        UPDATE group_tool_mapping
-        SET is_enabled = 'ENABLE'
-        WHERE group_id = #{groupId}
-    </update>
-
+    <!-- 系统启动时关联群组所有工具 -->
     <insert id="enableAllToolsForGroup">
-        INSERT IGNORE INTO group_tool_mapping (group_id, tool_id, is_enabled)
-        SELECT #{groupId}, t.tool_id, 'ENABLE'
-        FROM tools t
+        INSERT IGNORE INTO group_tool_config (group_id, tool_code, status)
+        SELECT #{groupId}, tool_code, tool_default_type
+        FROM tool
     </insert>
 
-    <select id="selectGroupToolMappingsByGroupId" resultType="com.bot.akane.model.entity.GroupToolMapping">
-        SELECT m.id, m.tool_id as toolId, m.is_enabled as isEnabled, t.tool_name as toolName, t.description as toolDesc
-        FROM group_tool_mapping m
-        JOIN tools t ON m.tool_id = t.tool_id
-        WHERE m.group_id = #{groupId}
-        ORDER BY m.id
+    <!-- 查询群组的工具配置列表 -->
+    <select id="selectGroupToolConfigsByGroupId" resultMap="GroupToolConfigResultMap">
+        SELECT 
+            g.group_id,
+            g.tool_code,
+            g.status,
+            g.created_at,
+            g.updated_at,
+            t.tool_name,
+            t.description
+        FROM group_tool_config g
+        LEFT JOIN tool t ON g.tool_code = t.tool_code
+        WHERE g.group_id = #{groupId}
+        ORDER BY g.tool_code;
     </select>
 
+    <!-- 查询所有群组ID -->
     <select id="selectAllGroupIds" resultType="string">
         SELECT DISTINCT group_id
-        FROM `group`
+        FROM chat_group
     </select>
 
 </mapper>

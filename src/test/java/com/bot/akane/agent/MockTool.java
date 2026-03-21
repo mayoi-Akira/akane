@@ -4,7 +4,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.stereotype.Component;
 
-import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolType;
 import com.bot.akane.agent.toolSettings.ToolInterface;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +27,13 @@ public class MockTool implements ToolInterface {
     }
 
     @Override
-    public ToolDefaultType getType() {
-        return ToolDefaultType.ENABLE;
+    public ToolType getType() {
+        return ToolType.ENABLE;
+    }
+
+    @Override
+    public String getCode() {
+        return "MockTool";
     }
 
     @Tool(name = "echo", description = "Echo the input")

@@ -3,7 +3,7 @@ package com.bot.akane.agent.tools;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
-import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolType;
 import com.bot.akane.agent.toolSettings.ToolInterface;
 import com.bot.akane.agent.toolsService.EmailService;
 
@@ -24,8 +24,13 @@ public class EmailTool implements ToolInterface{
     public String getDescription(){return "用于发送邮件的工具，发送邮件给指定的收件人。发送采用异步方式，不会阻塞。";}
 
     @Override
-    public ToolDefaultType getType() {
-        return ToolDefaultType.ENABLE;
+    public ToolType getType() {
+        return ToolType.ENABLE;
+    }
+
+    @Override
+    public String getCode() {
+        return "4";
     }
 
     @Tool(name="sendEmail", description="发送邮件给指定的收件人，参数包括：to（收件人邮箱地址），subject（邮件主题），content（邮件内容）。邮件采用异步方式发送，工具调用会立即返回，实际发送在后台执行。")

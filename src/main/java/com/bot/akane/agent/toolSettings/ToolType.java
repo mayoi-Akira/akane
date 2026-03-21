@@ -3,7 +3,7 @@ package com.bot.akane.agent.toolSettings;
 /**
  * 工具的默认开启状态
  */
-public enum ToolDefaultType {
+public enum ToolType {
     /**
      * 正常启用 - 工具可被启用或禁用
      */

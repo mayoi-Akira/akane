@@ -1,5 +1,5 @@
 -- 1. 群聊配置表
-CREATE TABLE IF NOT EXISTS `group` (
+CREATE TABLE IF NOT EXISTS chat_group (
     group_id VARCHAR(255) PRIMARY KEY,
     group_name VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
@@ -7,18 +7,22 @@ CREATE TABLE IF NOT EXISTS `group` (
 );
 
 -- 2. 工具定义表
-CREATE TABLE IF NOT EXISTS tools (
-    tool_id INT AUTO_INCREMENT PRIMARY KEY,
-    tool_code VARCHAR(100) NOT NULL UNIQUE, -- 对应代码里的 getName()
+CREATE TABLE IF NOT EXISTS tool (
+    tool_code VARCHAR(100) PRIMARY KEY,
     tool_name VARCHAR(100) NOT NULL,
-    description TEXT
+    description TEXT,
+    tool_default_type ENUM('ENABLE', 'DISABLE', 'FORCE', 'DEVELOPING', 'DEPRECATED') DEFAULT 'ENABLE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 3. 群组-工具关联表
-CREATE TABLE IF NOT EXISTS group_tool_mapping (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id VARCHAR(255) REFERENCES `group`(group_id),
-    tool_id INT REFERENCES tools(tool_id),
-    is_enabled ENUM('ENABLE', 'DISABLE', 'FORCE', 'DEVELOPING', 'DEPRECATED') DEFAULT 'ENABLE',
-    UNIQUE(group_id, tool_id)
+CREATE TABLE IF NOT EXISTS group_tool_config (
+    group_id VARCHAR(255) NOT NULL,
+    tool_code VARCHAR(100) NOT NULL,
+    status ENUM('ENABLE', 'DISABLE', 'FORCE', 'DEVELOPING', 'DEPRECATED') DEFAULT 'ENABLE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (group_id, tool_code),
+    FOREIGN KEY (group_id) REFERENCES chat_group(group_id),
+    FOREIGN KEY (tool_code) REFERENCES tool(tool_code)
 );

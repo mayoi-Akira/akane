@@ -18,6 +18,11 @@ public interface ToolInterface {
     /**
      * 获取工具类型
      */
-    ToolDefaultType getType();
+    ToolType getType();
+
+    /**
+     * 获取工具代码
+     */
+    String getCode();
 
 }

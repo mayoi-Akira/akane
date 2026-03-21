@@ -2,7 +2,7 @@ package com.bot.akane.agent.tools;
 
 import org.springframework.stereotype.Component;
 
-import com.bot.akane.agent.toolSettings.ToolDefaultType;
+import com.bot.akane.agent.toolSettings.ToolType;
 import com.bot.akane.agent.toolSettings.ToolInterface;
 import com.bot.akane.agent.toolsService.WeatherService;
 
@@ -28,8 +28,13 @@ public class WeatherTools implements ToolInterface {
     }
 
     @Override
-    public ToolDefaultType getType() {
-        return ToolDefaultType.ENABLE;
+    public ToolType getType() {
+        return ToolType.ENABLE;
+    }
+
+    @Override
+    public String getCode() {
+        return "2";
     }
 
     @Tool(name = "getWeatherForDays", description = "获取指定城市未来几天的天气信息，参数分别为城市名称、上级城市名称（可为空）和未来天数")

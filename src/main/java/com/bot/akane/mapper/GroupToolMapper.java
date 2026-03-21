@@ -5,37 +5,68 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.bot.akane.model.entity.Tools;
-import com.bot.akane.agent.toolSettings.ToolDefaultType;
-import com.bot.akane.model.entity.GroupToolMapping;
+import com.bot.akane.model.entity.Tool;
+import com.bot.akane.agent.toolSettings.ToolType;
+import com.bot.akane.model.entity.GroupToolConfig;
 
 @Mapper
 public interface GroupToolMapper {
 
-    List<Tools> selectAllTools();
+    /**
+     * 查询所有工具
+     */
+    List<Tool> selectAllTools();
 
-    List<Tools> selectEnabledToolsByGroupId(@Param("groupId") String groupId);
+    /**
+     * 查询指定群组启用的工具
+     */
+    List<Tool> selectEnabledToolsByGroupId(@Param("groupId") String groupId);
 
-    Tools selectToolByCode(@Param("toolCode") String toolCode);
+    /**
+     * 根据工具代码查询工具
+     */
+    Tool selectToolByCode(@Param("toolCode") String toolCode);
 
+    /**
+     * 批量查询存在的工具代码
+     */
     List<String> selectExistingToolCodes(@Param("toolCodes") List<String> toolCodes);
 
-    int insertGroupConfigIfAbsent(@Param("groupId") String groupId);
+    /**
+     * 创建群聊配置（如果不存在）
+     */
+    int insertGroupIfAbsent(@Param("groupId") String groupId);
 
-    int insertToolIfAbsent(@Param("tool") Tools tool);
+    /**
+     * 创建工具（如果不存在）
+     */
+    int insertToolIfAbsent(@Param("tool") Tool tool);
 
-    int disableMappingsByGroupId(@Param("groupId") String groupId);
+    /**
+     * 禁用群组的所有工具
+     */
+    int disableAllToolsForGroup(@Param("groupId") String groupId);
 
-    int upsertGroupToolMapping(
+    /**
+     * 创建或更新群组-工具配置
+     */
+    int upsertGroupToolConfig(
             @Param("groupId") String groupId,
             @Param("toolCode") String toolCode,
-            @Param("isEnabled") ToolDefaultType isEnabled);
+            @Param("status") ToolType status);
 
-    int enableMappingsByGroupId(@Param("groupId") String groupId);
-
+    /**
+     * 启用群组的所有工具
+     */
     int enableAllToolsForGroup(@Param("groupId") String groupId);
 
-    List<GroupToolMapping> selectGroupToolMappingsByGroupId(@Param("groupId") String groupId);
+    /**
+     * 查询群组的工具配置列表
+     */
+    List<GroupToolConfig> selectGroupToolConfigsByGroupId(@Param("groupId") String groupId);
 
+    /**
+     * 查询所有群组ID
+     */
     List<String> selectAllGroupIds();
 }

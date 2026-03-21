@@ -2,7 +2,7 @@ package com.bot.akane.service;
 
 import java.util.List;
 
-import com.bot.akane.model.entity.GroupToolMapping;
+import com.bot.akane.model.entity.GroupToolConfig;
 
 public interface GroupToolService {
     /**
@@ -27,9 +27,9 @@ public interface GroupToolService {
     String updateToolsForGroup(String groupId, String[] toolNames);
 
     /**
-     * 获取指定群聊的所有工具映射信息
+     * 获取指定群聊的所有工具配置信息
      * @param groupId 群聊ID
-     * @return 工具映射列表
+     * @return 工具配置列表
      */
-    List<GroupToolMapping> getGroupToolMappings(String groupId);
+    List<GroupToolConfig> getGroupToolMappings(String groupId);
 }
