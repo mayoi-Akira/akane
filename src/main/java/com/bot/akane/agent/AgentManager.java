@@ -17,7 +17,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.bot.akane.agent.tools.ToolInterface;
+import com.bot.akane.exception.AgentException;
 import com.bot.akane.service.GroupToolService;
+import com.bot.akane.util.TraceIdUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,32 +46,49 @@ public class AgentManager {
     private RedisTemplate<String, String> redisTemplate;
 
     private static final String GROUP_CHAT_LOCK_KEY_PREFIX = "akane:chat:lock:";
-    //防止意外导致锁无法释放，设置5分钟过期
     private static final Duration GROUP_CHAT_LOCK_TTL = Duration.ofMinutes(5);
     
     public String chat(String groupId, String userInput) {
-        log.info(systemPrompt);
+        TraceIdUtil.setGroupId(groupId);
+        log.info("Agent chat started, groupId: {}, userInput length: {}", groupId, userInput.length());
+        
         String lockKey = GROUP_CHAT_LOCK_KEY_PREFIX + groupId;
         Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", GROUP_CHAT_LOCK_TTL);
         if (!Boolean.TRUE.equals(lockAcquired)) {
-            return "AI思考中，请稍后";
+            log.warn("Failed to acquire lock for groupId: {}", groupId);
+            return "akane 思考中，请稍后...";
         }
 
         Agent agent = agentCache.computeIfAbsent(groupId, id -> createNewAgent(id));
         try {
-            return agent.chat(userInput);
+            String response = agent.chat(userInput);
+            log.info("Agent chat completed successfully, groupId: {}, response length: {}", groupId, response.length());
+            return response;
+        } catch (AgentException e) {
+            log.error("Agent execution failed with business exception, groupId: {}, errorCode: {}", 
+                      groupId, e.getErrorCode(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Agent execution failed with unexpected exception, groupId: {}", groupId, e);
+            throw new AgentException("AGENT_EXECUTION_ERROR", "Agent 执行失败: " + e.getMessage(), e);
         } finally {
             redisTemplate.delete(lockKey);
         }
     }
 
     private Agent createNewAgent(String groupId) {
+        log.debug("Creating new agent for groupId: {}", groupId);
         List<String> enabledToolCodes = groupToolService.getToolsForGroup(groupId);
+        log.debug("Enabled tools for groupId {}: {}", groupId, enabledToolCodes);
+        
         Object[] activeToolObjects = applicationContext.getBeansOfType(ToolInterface.class)
                 .values()
                 .stream()
             .filter(tool -> enabledToolCodes.contains(tool.getName()))
                 .toArray();
+        
+        log.debug("Active tool objects count: {}", activeToolObjects.length);
+        
         ToolCallback[] toolCallbacks = MethodToolCallbackProvider.builder()
                 .toolObjects(activeToolObjects)
                 .build()
@@ -85,6 +104,7 @@ public class AgentManager {
                 "session-" + groupId,
                 Arrays.asList(toolCallbacks)
         );
+        log.info("Agent created successfully for groupId: {}, agentName: {}", groupId, agent.getName());
         return agent;
     }
 }

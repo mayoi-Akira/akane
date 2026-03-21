@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}spring.log}"/>
+    <property name="LOG_FILE_MAX_SIZE" value="${LOG_FILE_MAX_SIZE:-10MB}"/>
+    <property name="LOG_FILE_MAX_HISTORY" value="${LOG_FILE_MAX_HISTORY:-0}"/>
+    <property name="LOG_LEVEL_PATTERN" value="%5p"/>
+    <property name="LOG_DATEFORMAT_PATTERN" value="yyyy-MM-dd HH:mm:ss.SSS"/>
+    <property name="LOG_PATTERN" value="%d{${LOG_DATEFORMAT_PATTERN}} ${LOG_LEVEL_PATTERN} [%thread] [%X{traceId}] [%X{sessionId}] [%X{groupId}] %logger{39} : %msg%n%ex"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!-- Agent 相关日志 -->
+    <logger name="com.bot.akane.agent" level="DEBUG"/>
+    
+    <!-- 工具调用日志 -->
+    <logger name="com.bot.akane.agent.tools" level="DEBUG"/>
+    
+    <!-- 服务层日志 -->
+    <logger name="com.bot.akane.service" level="DEBUG"/>
+    
+    <!-- 控制器日志 -->
+    <logger name="com.bot.akane.controller" level="DEBUG"/>
+</configuration>

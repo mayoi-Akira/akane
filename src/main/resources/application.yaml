@@ -32,13 +32,8 @@ spring:
       base-url: https://api.deepseek.com
       chat:
         options:
-          model:
-    zhipuai:
-      api-key:
-      base-url: https://open.bigmodel.cn/api/paas
-      chat:
-        options:
-          model:
+          model: deepseek-chat
+# 和风天气
 weather:
   api-key:
   api-host:
@@ -48,7 +43,10 @@ mybatis:
   type-aliases-package: com.bot.akane.model.entity
   mapper-locations: classpath:mapper/*.xml
   type-handlers-package: com.bot.akane.typehandler
-
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
 Agent:
   name: akane-agent
   system-prompt: |

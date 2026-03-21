@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bot.akane.agent.examples.AgentV2;
+import com.bot.akane.agent.Agent;
 import com.bot.akane.agent.tools.DateTimeTool;
 import com.bot.akane.agent.tools.EmailTool;
 import com.bot.akane.agent.tools.WeatherTools;
@@ -42,7 +42,7 @@ public class AgentTest {
                 .toolObjects(dateTimeTool, weatherTools,emailTool)
                 .build()
                 .getToolCallbacks();
-        AgentV2 agent = new AgentV2(
+        Agent agent = new Agent(
                 "test-agent-v2",
                 "测试",
                 prompt,
