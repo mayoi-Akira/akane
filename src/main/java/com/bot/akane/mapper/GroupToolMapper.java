@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.bot.akane.agent.tools.ToolDefaultType;
 import com.bot.akane.model.entity.Tools;
 import com.bot.akane.model.entity.GroupToolMapping;
 
@@ -28,7 +29,7 @@ public interface GroupToolMapper {
     int upsertGroupToolMapping(
             @Param("groupId") String groupId,
             @Param("toolCode") String toolCode,
-            @Param("isEnabled") Boolean isEnabled);
+            @Param("isEnabled") ToolDefaultType isEnabled);
 
     int enableMappingsByGroupId(@Param("groupId") String groupId);
 

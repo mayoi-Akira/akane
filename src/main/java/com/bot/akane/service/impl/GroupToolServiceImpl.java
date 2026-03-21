@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bot.akane.agent.tools.ToolDefaultType;
 import com.bot.akane.mapper.GroupToolMapper;
 import com.bot.akane.model.entity.Tools;
 import com.bot.akane.model.entity.GroupToolMapping;
@@ -118,7 +119,7 @@ public class GroupToolServiceImpl implements GroupToolService {
 		groupToolMapper.insertGroupConfigIfAbsent(cleanGroupId);
 		groupToolMapper.disableMappingsByGroupId(cleanGroupId);
 		normalizedToolCodes.forEach(toolCode ->
-				groupToolMapper.upsertGroupToolMapping(cleanGroupId, toolCode, true));
+				groupToolMapper.upsertGroupToolMapping(cleanGroupId, toolCode, ToolDefaultType.ENABLE));
 
 		return "群 " + cleanGroupId + " 工具更新成功，已启用: " + String.join(", ", normalizedToolCodes);
 	}

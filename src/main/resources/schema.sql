@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS group_tool_mapping (
     id INT AUTO_INCREMENT PRIMARY KEY,
     group_id VARCHAR(255) REFERENCES `group`(group_id),
     tool_id INT REFERENCES tools(tool_id),
-    is_enabled BOOLEAN DEFAULT TRUE,
+    is_enabled ENUM('ENABLE', 'DISABLE', 'FORCE', 'DEVELOPING', 'DEPRECATED') DEFAULT 'ENABLE',
     UNIQUE(group_id, tool_id)
 );
