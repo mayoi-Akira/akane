@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bot.akane.model.entity.GroupToolConfig;
-import com.bot.akane.model.entity.Tool;
 import com.bot.akane.model.request.ToolUpdateRequest;
 import com.bot.akane.model.response.ApiResponse;
 import com.bot.akane.service.GroupToolService;

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bot.akane.mapper.LocationMapper">
+
+<resultMap id="locationMap" type="LocationEntiy">
+    <result column="city_name" property="cityName"/>
+    <result column="adm" property="adm"/>
+    <result column="lon_and_lat" property="lonAndLat"/>
+</resultMap>
+
+    <!-- getLocationByCityAndAdm --> 
+
+    <select id="getLocationByCityAndAdm" resultMap="locationMap">
+        SELECT city_name, adm, lon_and_lat
+        FROM city_location
+        WHERE city_name = #{cityName} AND adm = #{adm}
+    </select>
+
+    <!-- insertLocation -->
+    <insert id="insertLocation">
+        INSERT INTO city_location (city_name, adm, lon_and_lat)
+        VALUES (#{cityName}, #{adm}, #{lonAndLat})
+    </insert>
+
+    <insert id="upsertLocation">
+        INSERT INTO city_location (city_name, adm, lon_and_lat)
+        VALUES (#{cityName}, #{adm}, #{lonAndLat})
+        ON DUPLICATE KEY UPDATE lon_and_lat = VALUES(lon_and_lat)
+    </insert>
+
+    <select id="getAllLocations" resultMap="locationMap">
+        SELECT city_name, adm, lon_and_lat
+        FROM city_location
+    </select>
+</mapper>

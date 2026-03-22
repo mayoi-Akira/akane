@@ -26,3 +26,11 @@ CREATE TABLE IF NOT EXISTS group_tool_config (
     FOREIGN KEY (group_id) REFERENCES chat_group(group_id),
     FOREIGN KEY (tool_code) REFERENCES tool(tool_code)
 );
+
+-- 4. 城市坐标表
+CREATE TABLE IF NOT EXISTS city_location (
+    city_name VARCHAR(255) NOT NULL,
+    adm VARCHAR(255) NOT NULL,
+    lon_and_lat VARCHAR(255) NOT NULL,
+    PRIMARY KEY (city_name, adm)
+);

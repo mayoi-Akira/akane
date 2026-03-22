@@ -5,14 +5,27 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import lombok.RequiredArgsConstructor;
+import java.util.Objects;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bot.akane.agent.toolsService.CityLocationService;
+import com.bot.akane.mapper.LocationMapper;
+import com.bot.akane.model.entity.LocationEntiy;
 
 @Service
+@RequiredArgsConstructor
 public class CityLocationServiceImpl implements CityLocationService {
+
+    private static final String CITY_LOCATION_CACHE = "cityLocationCache";
 
     @Value("${weather.api-host}")
     private String apiHost;
@@ -20,8 +33,54 @@ public class CityLocationServiceImpl implements CityLocationService {
     @Value("${weather.api-key}")
     private String apiKey;
 
+    private final LocationMapper locationMapper;
+    private final LocationAsyncPersistenceService locationAsyncPersistenceService;
+    private final CacheManager cacheManager;
+
+    private String buildCacheKey(String cityName, String adm) {
+        String normalizedCity = cityName == null ? "" : cityName.trim();
+        String normalizedAdm = adm == null ? "" : adm.trim();
+        return normalizedCity + "_" + normalizedAdm;
+    }
+
     @Override
+    @Cacheable( value = CITY_LOCATION_CACHE,
+            key = "(#cityName == null ? '' : #cityName.trim()) + '_' + (#adm == null ? '' : #adm.trim())",
+            unless = "#result == null")
     public String getCityLocation(String cityName, String adm) {
+        String normalizedCity = cityName == null ? "" : cityName.trim();
+        String normalizedAdm = adm == null ? "" : adm.trim();
+
+        LocationEntiy locationEntity = locationMapper.getLocationByCityAndAdm(normalizedCity, normalizedAdm);
+        if (locationEntity != null) {
+            return locationEntity.getLonAndLat();
+        }
+        String result = getCityLocationFromApi(normalizedCity, normalizedAdm);
+        if (result != null) {
+            locationAsyncPersistenceService.upsertLocationAsync(normalizedCity, normalizedAdm, result);
+        }
+        return result;
+    }
+
+    @SuppressWarnings("null")
+    @EventListener(ApplicationReadyEvent.class)
+    public void syncCacheAndDbOnStartup() {
+        Cache cache = cacheManager.getCache(CITY_LOCATION_CACHE);
+        if (cache == null) {
+            return;
+        }
+
+        for (LocationEntiy entity : locationMapper.getAllLocations()) {
+            String lonAndLat = entity.getLonAndLat();
+            if (!StringUtils.hasText(lonAndLat)) {
+                continue;
+            }
+            cache.put(buildCacheKey(entity.getCityName(), entity.getAdm()), Objects.requireNonNull(lonAndLat));
+        }
+    }
+
+    @Override
+    public  String getCityLocationFromApi(String cityName, String adm) {
         // System.out.println(apiHost);
         // System.out.println(apiKey);
 
