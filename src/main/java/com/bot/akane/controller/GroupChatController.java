@@ -27,20 +27,20 @@ public class GroupChatController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> chat(@RequestBody ChatRequest request) {
         log.info("Chat request received: {}", request);
         String groupId = request.getGroupId();
-        String userInput = request.getUserInput();
+        String userMessage = request.getUserMessage();
         String messageId = request.getMessageId();
         String userId = request.getUserId();
         
         if(groupId == null || groupId.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(400, "群聊ID不能为空。", Map.of()));
         }
-        if(userInput == null || userInput.trim().isEmpty()) {
+        if(userMessage == null || userMessage.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(400, "消息内容不能为空。", Map.of()));
         }
 
         try {
             TraceIdUtil.setGroupId(groupId);
-            String response = groupChatService.chat(groupId, userId, messageId, userInput);
+            String response = groupChatService.chat(groupId, userId, messageId, userMessage);
             return ResponseEntity.ok(ApiResponse.success("聊天成功", Map.of(
                     "groupId", groupId.trim(),
                     "reply", response

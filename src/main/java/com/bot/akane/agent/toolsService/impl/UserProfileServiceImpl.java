@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -55,13 +54,15 @@ public class UserProfileServiceImpl implements UserProfileService {
             String key = "user_profile:" + userId;
              Map<Object, Object> map = redisTemplate.opsForHash().entries(key);
             if (map != null && !map.isEmpty()) {
+                map.put("userId", userId);
                 return toJson(map);
             }
 
             List<UserProfileEntity> list = userProfileMapper.getUserProfiles(userId);
 
             if (list == null || list.isEmpty()) {
-                return "{}"; 
+                String emptyResult = "{\"userId\": \"" + userId + "\"}";
+                return emptyResult; 
             }
 
             Map<String, String> resultMap = new HashMap<>();
@@ -70,7 +71,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             }
 
             redisTemplate.opsForHash().putAll(key, resultMap);
-
+            resultMap.put("userId", userId);
             return toJson(resultMap);
         } catch (Exception e) {
             return "获取用户个人信息失败：" + e.getMessage();

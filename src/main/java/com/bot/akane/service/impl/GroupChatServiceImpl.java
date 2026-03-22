@@ -16,20 +16,20 @@ public class GroupChatServiceImpl implements GroupChatService{
     private final GroupToolService groupToolService;
 
     @Override
-    public String chat(String groupId, String userId, String messageId, String userInput) {
-        if (userInput == null || userInput.trim().isEmpty()) {
+    public String chat(String groupId, String userId, String messageId, String userMessage) {
+        if (userMessage == null || userMessage.trim().isEmpty()) {
             return "请输入消息内容。";
         }
         if (groupId == null || groupId.trim().isEmpty()) {
             return "群聊ID不能为空。";
         }
         String cleanGroupId = groupId.trim();
-        String cleanUserInput = userInput.trim();
+        String cleanUserMessage = userMessage.trim();
         
         try {
             // 初始化群聊工具配置：群不存在时自动创建，并默认启用全部工具。
             groupToolService.getToolsForGroup(cleanGroupId);
-            return agentManager.chat(cleanGroupId, userId, messageId, cleanUserInput);
+            return agentManager.chat(cleanGroupId, userId, messageId, cleanUserMessage);
         } catch (Exception e) {
             return "处理群聊消息失败：" + e.getMessage();
         }

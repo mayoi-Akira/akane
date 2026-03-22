@@ -7,10 +7,10 @@ public class ChatRequest {
     private String groupId;
     private String messageId;
     private String userId;
-    private String userInput;
+    private String userMessage;
    
     public String toString() {
-        return "ChatRequest{groupId='" + groupId + "', messageId='" + messageId + "', userId='" + userId + "', userInput='" + userInput + "'}";
+        return "ChatRequest{groupId='" + groupId + "', messageId='" + messageId + "', userId='" + userId + "', userMessage='" + userMessage + "'}";
     }
 
 }

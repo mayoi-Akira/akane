@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.bot.akane.agent.toolSettings.ToolInterface;
+import com.bot.akane.agent.toolsService.impl.UserProfileServiceImpl;
 import com.bot.akane.exception.AgentException;
 import com.bot.akane.service.GroupToolService;
 import com.bot.akane.util.TraceIdUtil;
@@ -31,6 +32,7 @@ public class AgentManager {
     private final ApplicationContext applicationContext;
     private final GroupToolService groupToolService;
     private final Map<String, Agent> agentCache = new ConcurrentHashMap<>();
+    private final UserProfileServiceImpl userProfileService;
 
     @Autowired
     @Qualifier("deepseek-chat")
@@ -51,9 +53,9 @@ public class AgentManager {
     private static final String GROUP_CHAT_LOCK_KEY_PREFIX = "akane:chat:lock:";
     private static final Duration GROUP_CHAT_LOCK_TTL = Duration.ofMinutes(5);
     
-    public String chat(String groupId, String userId, String messageId, String userInput) {
+    public String chat(String groupId, String userId, String messageId, String userMessage) {
         TraceIdUtil.setGroupId(groupId);
-        log.info("Agent chat started, groupId: {}, userInput length: {}", groupId, userInput.length());
+        log.info("Agent chat started, groupId: {}, userMessage length: {}", groupId, userMessage.length());
         
         String lockKey = GROUP_CHAT_LOCK_KEY_PREFIX + groupId;
         Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", GROUP_CHAT_LOCK_TTL);
@@ -64,6 +66,13 @@ public class AgentManager {
 
         Agent agent = agentCache.computeIfAbsent(groupId, id -> createNewAgent(id));
         try {
+            String userProfileInfo = userProfileService.getUserProfile(userId);
+
+            if(userProfileInfo == null || userProfileInfo.trim().isEmpty()) {
+                userProfileInfo = "无相关资料。";
+            } 
+            String userInput = "{userProfileInfo: " + userProfileInfo + ", userMessage: " + userMessage + "}";
+            
             String response = agent.chat(userInput);
             log.info("Agent chat completed successfully, groupId: {}, response length: {}", groupId, response.length());
             return response;
