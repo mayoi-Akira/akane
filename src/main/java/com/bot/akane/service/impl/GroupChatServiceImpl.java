@@ -16,7 +16,7 @@ public class GroupChatServiceImpl implements GroupChatService{
     private final GroupToolService groupToolService;
 
     @Override
-    public String chat(String groupId, String userInput) {
+    public String chat(String groupId, String userId, String messageId, String userInput) {
         if (userInput == null || userInput.trim().isEmpty()) {
             return "请输入消息内容。";
         }
@@ -29,7 +29,7 @@ public class GroupChatServiceImpl implements GroupChatService{
         try {
             // 初始化群聊工具配置：群不存在时自动创建，并默认启用全部工具。
             groupToolService.getToolsForGroup(cleanGroupId);
-            return agentManager.chat(cleanGroupId, cleanUserInput);
+            return agentManager.chat(cleanGroupId, userId, messageId, cleanUserInput);
         } catch (Exception e) {
             return "处理群聊消息失败：" + e.getMessage();
         }

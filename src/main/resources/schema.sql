@@ -34,3 +34,11 @@ CREATE TABLE IF NOT EXISTS city_location (
     lon_and_lat VARCHAR(255) NOT NULL,
     PRIMARY KEY (city_name, adm)
 );
+
+-- 5. 用户个人资料表（昵称邮箱及各种平台）
+CREATE TABLE IF NOT EXISTS user_profile(
+    user_id VARCHAR(255),
+    profile_key VARCHAR(255),
+    profile_value VARCHAR(255),
+    PRIMARY KEY (user_id, profile_key)
+)

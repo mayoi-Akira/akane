@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bot.akane.mapper.UserProfileMapper">
+    <resultMap id="UserProfileResultMap" type="com.bot.akane.model.entity.UserProfileEntity">
+        <id property="userId" column="user_id"/>
+        <result property="profileKey" column="profile_key"/>
+        <result property="profileValue" column="profile_value"/>
+    </resultMap>
+
+    <!-- upsertUserProfile --> 
+
+    <insert id="upsertUserProfile">
+        INSERT INTO user_profile (user_id, profile_key, profile_value)
+        VALUES (#{userId}, #{profileKey}, #{profileValue})
+        ON DUPLICATE KEY UPDATE profile_value = VALUES(profile_value)
+    </insert>    
+
+    <!-- getUserProfiles --> 
+
+    <select id="getUserProfiles" resultMap="UserProfileResultMap">
+        SELECT user_id, profile_key, profile_value
+        FROM user_profile
+        WHERE user_id = #{userId}
+    </select>
+</mapper>

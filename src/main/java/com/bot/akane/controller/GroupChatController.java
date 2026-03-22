@@ -28,6 +28,8 @@ public class GroupChatController {
         log.info("Chat request received: {}", request);
         String groupId = request.getGroupId();
         String userInput = request.getUserInput();
+        String messageId = request.getMessageId();
+        String userId = request.getUserId();
         
         if(groupId == null || groupId.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(400, "群聊ID不能为空。", Map.of()));
@@ -38,7 +40,7 @@ public class GroupChatController {
 
         try {
             TraceIdUtil.setGroupId(groupId);
-            String response = groupChatService.chat(groupId, userInput);
+            String response = groupChatService.chat(groupId, userId, messageId, userInput);
             return ResponseEntity.ok(ApiResponse.success("聊天成功", Map.of(
                     "groupId", groupId.trim(),
                     "reply", response

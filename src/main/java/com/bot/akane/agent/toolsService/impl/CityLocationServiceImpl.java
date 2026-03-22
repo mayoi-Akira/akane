@@ -34,7 +34,7 @@ public class CityLocationServiceImpl implements CityLocationService {
     private String apiKey;
 
     private final LocationMapper locationMapper;
-    private final LocationAsyncPersistenceService locationAsyncPersistenceService;
+    private final LocationAsyncSaveToDbService locationAsyncPersistenceService;
     private final CacheManager cacheManager;
 
     private String buildCacheKey(String cityName, String adm) {

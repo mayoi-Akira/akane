@@ -21,10 +21,10 @@ public class AgentController {
     private final AgentManager agentManager;
 
     @GetMapping("/reset")
-    public ResponseEntity<ApiResponse<String>> resetAgent(@RequestParam String groupId) {
+    public ResponseEntity<ApiResponse<String>> resetAgent(@RequestParam String groupId, @RequestParam String messageId) {
         log.info("Received request to reset agent.");
         try {
-            String result = agentManager.resetAgent(groupId);
+            String result = agentManager.resetAgent(groupId, messageId);
             log.info("Agent reset successfully.");
             return ResponseEntity.ok(ApiResponse.success(result, null));
         } catch (Exception e) {

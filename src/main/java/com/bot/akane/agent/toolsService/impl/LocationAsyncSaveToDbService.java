@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LocationAsyncPersistenceService {
+public class LocationAsyncSaveToDbService {
 
     private final LocationMapper locationMapper;
 

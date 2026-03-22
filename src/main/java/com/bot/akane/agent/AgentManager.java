@@ -51,7 +51,7 @@ public class AgentManager {
     private static final String GROUP_CHAT_LOCK_KEY_PREFIX = "akane:chat:lock:";
     private static final Duration GROUP_CHAT_LOCK_TTL = Duration.ofMinutes(5);
     
-    public String chat(String groupId, String userInput) {
+    public String chat(String groupId, String userId, String messageId, String userInput) {
         TraceIdUtil.setGroupId(groupId);
         log.info("Agent chat started, groupId: {}, userInput length: {}", groupId, userInput.length());
         
@@ -59,7 +59,7 @@ public class AgentManager {
         Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", GROUP_CHAT_LOCK_TTL);
         if (!Boolean.TRUE.equals(lockAcquired)) {
             log.warn("Failed to acquire lock for groupId: {}", groupId);
-            return "akane 思考中，请稍后...";
+            return "<quote id=\"" + messageId + "\"/> akane 思考中，请稍后...";
         }
 
         Agent agent = agentCache.computeIfAbsent(groupId, id -> createNewAgent(id));
@@ -79,12 +79,12 @@ public class AgentManager {
         }
     }
 
-    public String resetAgent(String groupId) {
+    public String resetAgent(String groupId, String messageId) {
         String lockKey = GROUP_CHAT_LOCK_KEY_PREFIX + groupId;
         Boolean lockAcquired = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", GROUP_CHAT_LOCK_TTL);
         if (!Boolean.TRUE.equals(lockAcquired)) {
             log.warn("Failed to acquire lock for groupId: {}", groupId);
-            return "akane 还在思考中，请稍后再试...";
+            return "<quote id=\"" + messageId + "\"/>akane 还在思考中，请稍后再试...";
         }
         log.info("Resetting agent for groupId: {}", groupId);
         // agentCache.get(groupId).reset();

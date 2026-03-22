@@ -5,10 +5,12 @@ import lombok.Data;
 @Data
 public class ChatRequest {
     private String groupId;
+    private String messageId;
+    private String userId;
     private String userInput;
    
     public String toString() {
-        return "ChatRequest{groupId='" + groupId + "', userInput='" + userInput + "'}";
+        return "ChatRequest{groupId='" + groupId + "', messageId='" + messageId + "', userId='" + userId + "', userInput='" + userInput + "'}";
     }
 
 }

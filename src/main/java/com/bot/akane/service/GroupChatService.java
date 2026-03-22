@@ -4,8 +4,10 @@ public interface GroupChatService {
     /**
      * 聊天
      * @param groupId 群ID
+     * @param userId 用户ID
+     * @param messageId 消息ID
      * @param userInput 用户输入的消息
      * @return 机器人的回复消息
      */
-    String chat(String groupId, String userInput);
+    String chat(String groupId, String userId, String messageId, String userInput);
 }
