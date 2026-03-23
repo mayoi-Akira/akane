@@ -40,5 +40,6 @@ CREATE TABLE IF NOT EXISTS user_profile(
     user_id VARCHAR(255),
     profile_key VARCHAR(255),
     profile_value VARCHAR(255),
+    is_deleted BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (user_id, profile_key)
 )

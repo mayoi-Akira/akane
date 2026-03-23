@@ -13,4 +13,6 @@ public interface UserProfileMapper {
 
     List<UserProfileEntity> getUserProfiles(String userId);
 
+    int deleteUserProfile(String userId, String profileKey);
+
 }

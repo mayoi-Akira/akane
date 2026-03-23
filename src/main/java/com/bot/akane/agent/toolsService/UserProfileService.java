@@ -17,4 +17,13 @@ public interface UserProfileService {
      * @return 所有该用户的画像信息，返回JSON字符串，格式为 {"profileKey1": "profileValue1", "profileKey2": "profileValue2", ...}
      */
     public String getUserProfile(String userId);
+
+    /**
+     * 删除用户画像信息
+     * @param userId 用户ID
+     * @param profileKey 画像信息的键，例如 "nick_name" 或 "github_url"
+     * @return 操作结果的反馈信息
+     */
+    public String deleteUserProfile(String userId, String profileKey);
+
 }

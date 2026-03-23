@@ -48,5 +48,12 @@ public class UserProfileTool implements ToolInterface {
     public String getUserProfile(@ToolParam(description = "用户ID")String userId) {
         return userProfileService.getUserProfile(userId);
     }
+
+    @Tool(name = "deleteUserProfile", description = "删除用户的个人信息，当用户要求删除某个信息或资料时使用这个工具")
+    public String deleteUserProfile(
+            @ToolParam(description = "用户ID")String userId, 
+            @ToolParam(description = "信息类型, 例如:nick_name, 再例如: github_url")String profileKey) {
+        return userProfileService.deleteUserProfile(userId, profileKey);
+    }
     
 }

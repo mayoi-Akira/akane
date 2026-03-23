@@ -7,21 +7,30 @@
         <id property="userId" column="user_id"/>
         <result property="profileKey" column="profile_key"/>
         <result property="profileValue" column="profile_value"/>
+        <result property="isDeleted" column="is_deleted"/>
     </resultMap>
 
     <!-- upsertUserProfile --> 
 
     <insert id="upsertUserProfile">
-        INSERT INTO user_profile (user_id, profile_key, profile_value)
-        VALUES (#{userId}, #{profileKey}, #{profileValue})
-        ON DUPLICATE KEY UPDATE profile_value = VALUES(profile_value)
+        INSERT INTO user_profile (user_id, profile_key, profile_value, is_deleted)
+        VALUES (#{userId}, #{profileKey}, #{profileValue}, FALSE)
+        ON DUPLICATE KEY UPDATE profile_value = VALUES(profile_value), is_deleted = FALSE
     </insert>    
 
     <!-- getUserProfiles --> 
 
     <select id="getUserProfiles" resultMap="UserProfileResultMap">
-        SELECT user_id, profile_key, profile_value
+        SELECT user_id, profile_key, profile_value, is_deleted
         FROM user_profile
-        WHERE user_id = #{userId}
+        WHERE user_id = #{userId} AND is_deleted = FALSE
     </select>
+
+    <!-- deleteUserProfile --> 
+
+    <update id="deleteUserProfile">
+        UPDATE user_profile
+        SET is_deleted = TRUE
+        WHERE user_id = #{userId} AND profile_key = #{profileKey}
+    </update>
 </mapper>

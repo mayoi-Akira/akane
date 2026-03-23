@@ -16,10 +16,12 @@ import com.bot.akane.model.response.ApiResponse;
 import com.bot.akane.service.GroupToolService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/tools")
 @RequiredArgsConstructor
+@Slf4j
 public class ToolsController {
     private final GroupToolService groupToolService;
     
@@ -30,6 +32,7 @@ public class ToolsController {
         }
         
         List<GroupToolConfig> configs = groupToolService.getGroupToolMappings(groupId);
+        log.info("获取群聊工具配置成功，群聊ID: {}", configs.toString());
         return ResponseEntity.ok(ApiResponse.success("获取成功", configs));
     }
 
