@@ -8,6 +8,7 @@ import com.bot.akane.agent.toolsService.CityLocationService;
 import com.bot.akane.agent.toolsService.EmailService;
 import com.bot.akane.agent.toolsService.WeatherService;
 import com.bot.akane.agent.toolsService.GithubToolsService;
+import com.bot.akane.agent.toolsService.NowCoderToolsService;
 
 @SpringBootTest
 public class ToolsServiceTest {
@@ -62,6 +63,15 @@ public class ToolsServiceTest {
         System.out.println(result);
     }
 
-    
-        
+    @Autowired
+    private NowCoderToolsService nowCoderToolsService;
+    @Test
+    public void testNowCoderToolsService() {
+        String result = nowCoderToolsService.getNowCoderContestInfo("588125209");
+        System.out.println(result);
+
+        result = nowCoderToolsService.getNowCoderContestRecord("588125209",10, true);
+        System.out.println(result);
+    }
+
 }
