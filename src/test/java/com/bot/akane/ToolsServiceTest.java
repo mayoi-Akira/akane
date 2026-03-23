@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.bot.akane.agent.toolsService.CityLocationService;
 import com.bot.akane.agent.toolsService.EmailService;
 import com.bot.akane.agent.toolsService.WeatherService;
+import com.bot.akane.agent.toolsService.GithubToolsService;
 
 @SpringBootTest
 public class ToolsServiceTest {
@@ -53,5 +54,14 @@ public class ToolsServiceTest {
         System.out.println("邮件发送请求已提交，实际发送在后台异步执行中...");
 
     }
+    @Autowired
+    private GithubToolsService githubToolsService;
+    @Test
+    public void testGithubGetRepoInfo(){
+        String result = githubToolsService.getRepoInfo("mayoi-Akira");
+        System.out.println(result);
+    }
+
+    
         
 }

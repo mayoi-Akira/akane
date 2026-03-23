@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import com.bot.akane.agent.toolSettings.ToolType;
 import com.bot.akane.agent.toolSettings.ToolInterface;
 
-@Component
+// @Component
 public class TerminateTool implements ToolInterface {
 
     @Override
@@ -29,6 +29,6 @@ public class TerminateTool implements ToolInterface {
         return "1";
     }
 
-    @Tool(name = "terminate", description = "如果你觉得当前所有的任务已经执行完毕了，就执行这个工具调用")
+    // @Tool(name = "terminate", description = "如果你觉得当前所有的任务已经执行完毕了，就执行这个工具调用")
     public void terminate() {}
 }

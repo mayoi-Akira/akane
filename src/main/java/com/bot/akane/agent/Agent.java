@@ -239,12 +239,12 @@ public class Agent implements AgentInterface {
                 .collect(Collectors.joining("\n"));
         log.info("工具调用结果：{}", result);
         
-        if (toolResponseMessage.getResponses()
-                .stream()
-                .anyMatch(resp -> resp.name().equals("terminate"))) {
-            stateManager.transitionTo(AgentState.FINISHED);
-            log.info("任务结束");
-        }
+        // if (toolResponseMessage.getResponses()
+        //         .stream()
+        //         .anyMatch(resp -> resp.name().equals("terminate"))) {
+        //     stateManager.transitionTo(AgentState.FINISHED);
+        //     log.info("任务结束");
+        // }
     }
 
     /**
