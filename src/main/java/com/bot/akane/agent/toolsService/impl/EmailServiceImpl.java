@@ -33,6 +33,7 @@ public class EmailServiceImpl implements EmailService {
             message.setFrom(from);
 
             // 发送邮件
+            System.out.println("mail password=" + from);
             mailSender.send(message);
 
             log.info("异步发送邮件成功，收件人: {}, 主题: {}", to, subject);

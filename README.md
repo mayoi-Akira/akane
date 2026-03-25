@@ -1,286 +1,133 @@
-**该文档由AI生成，供参考**
+# Akane
 
-# Akane Agent - 智能对话系统
+Akane 是一个基于 Spring Boot + Spring AI 的群聊 AI 助手后端，支持多工具调用、群级工具开关、上下文管理与 Agent 重置。
 
-[![Java](https://img.shields.io/badge/Java-17-blue)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.8-green)](https://spring.io/projects/spring-boot)
-[![Spring AI](https://img.shields.io/badge/Spring%20AI-1.1.0-brightgreen)](https://spring.io/projects/spring-ai)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+## 技术栈
 
-Akane 是一个基于 Spring AI 框架的智能 Agent 系统，支持多工具调用、ReAct 循环和分布式链路追踪。
+- Java 17
+- Spring Boot 3.5.8
+- Spring AI 1.1.0（DeepSeek）
+- MySQL + MyBatis
+- Redis（缓存/并发控制）
 
-主要用于作为接入QQ群的 AI 助手的后端，提供智能对话和工具调用能力。
+## 运行前准备
 
-QQ机器人方面使用的 [Koishi框架](https://github.com/koishijs/koishi)，本项目的Koishi插件地址：[koishi-plugin-akane](https://github.com/mayoi-Akira/koishi-plugin-akane)，插件只做指令调用，真正的智能对话、工具调用以及其他核心逻辑都在本项目中实现。
-
-## ✨ 核心特性
-
-- 🤖 **智能 Agent 引擎**：支持 ReAct 循环（Reasoning → Acting → Observing）
-- 🔧 **灵活的工具系统**：易于扩展，支持元数据和超时控制
-- 🔄 **自动重试机制**：指数退避重试，提高可靠性
-- 📊 **完整的链路追踪**：MDC 支持，便于分布式调试
-- 🛡️ **健壮的状态管理**：防止非法状态转换
-- 📝 **详细的文档**：架构文档、最佳实践、快速开始指南
-- ✅ **完善的测试**：单元测试和集成测试
-
-## 🚀 快速开始
-
-### 前置要求
-
-- Java 17+
-- Maven 3.6+
-- MySQL 5.7+
-- Redis 6.0+
-
-### 安装
+1. 安装 Java 17+ 与 Maven 3.9+。
+2. 准备 MySQL 与 Redis。
+3. 复制环境变量模板并填写：
 
 ```bash
-# 克隆项目
-git clone https://github.com/your-repo/akane.git
-cd akane
+cp .env.example .env
+```
 
-# 构建项目
+Windows CMD:
+
+```cmd
+copy .env.example .env
+```
+
+项目会通过 spring.config.import 自动读取根目录 .env。
+
+## 关键环境变量
+
+以下变量与 src/main/resources/application.yaml 一一对应：
+
+- SERVER_PORT: 服务端口，默认 1145
+- SPRING_PROFILES_ACTIVE: 运行环境，默认 dev
+- SPRING_CACHE_TYPE: 缓存类型，默认 redis
+- SPRING_DATASOURCE_URL: MySQL 连接串
+- MYSQL_APP_USER: 数据库用户名
+- MYSQL_ROOT_PASSWORD: 数据库密码
+- REDIS_HOST: Redis 主机
+- REDIS_PORT: Redis 端口
+- REDIS_DATABASE: Redis 数据库索引
+- EMAIL_HOST / EMAIL_PORT / EMAIL_USERNAME / EMAIL_PASSWORD: SMTP 配置
+- DEEPSEEK_API_KEY: DeepSeek API Key
+- DEEPSEEK_MODEL: 模型名，默认 deepseek-chat
+- WEATHER_API_KEY / WEATHER_API_URL: 天气接口配置
+
+建议优先使用专用数据库账号，不要使用 root 直连业务。
+
+## 启动项目
+
+```bash
 mvn clean package
-
-# 启动应用
 mvn spring-boot:run
 ```
 
-### 基本使用
+默认地址：
 
-```bash
-# 发送聊天请求
-curl -X POST http://localhost:1145/chat \
-  -H "Content-Type: application/json" \
-  -d '{
-    "groupId": "group-1",
-    "userInput": "你好，请告诉我现在的天气"
-  }'
-```
+- http://localhost:1145
 
-更多详情请查看 [快速开始指南](QUICKSTART.md)。
+## API 快速验证
 
-## 📚 文档
+### 1) 聊天接口
 
-- [架构文档](ARCHITECTURE.md) - 详细的系统架构设计
-- [最佳实践](BEST_PRACTICES.md) - 开发和使用最佳实践
-- [快速开始](QUICKSTART.md) - 5 分钟快速上手
-- [重构总结](REFACTORING_SUMMARY.md) - 重构工作总结
+- 路径: POST /chat
 
-## 🏗️ 项目结构
+请求示例：
 
-```
-akane/
-├── src/main/java/com/bot/akane/
-│   ├── agent/                    # Agent 核心模块
-│   │   ├── Agent.java           # Agent 主类
-│   │   ├── AgentManager.java    # Agent 工厂和生命周期管理
-│   │   ├── AgentState.java      # 状态枚举
-│   │   ├── AgentStateManager.java # 状态管理器
-│   │   ├── IAgent.java          # Agent 接口
-│   │   └── tools/               # 工具系统
-│   ├── controller/              # REST 控制器
-│   ├── service/                 # 业务服务层
-│   ├── exception/               # 异常体系
-│   ├── util/                    # 工具类
-│   └── config/                  # 配置类
-├── src/test/java/               # 测试代码
-├── src/main/resources/
-│   ├── application.yaml         # 应用配置
-│   ├── logback-spring.xml       # 日志配置
-│   └── schema.sql               # 数据库脚本
-├── ARCHITECTURE.md              # 架构文档
-├── BEST_PRACTICES.md            # 最佳实践
-├── QUICKSTART.md                # 快速开始
-└── REFACTORING_SUMMARY.md       # 重构总结
-```
-
-## 🔑 核心概念
-
-### Agent
-
-智能对话引擎，支持工具调用和多步骤推理。
-
-### Tool
-
-可被 Agent 调用的功能模块，支持超时和重试。
-
-### State
-
-Agent 的生命周期状态：IDLE → THINKING → EXECUTING → FINISHED
-
-### ReAct 循环
-
-- **Reasoning**：思考是否需要调用工具
-- **Acting**：执行工具
-- **Observing**：观察结果，决定是否继续
-
-## 🛠️ 创建自定义工具
-
-```java
-@Component
-@Slf4j
-@RequiredArgsConstructor
-public class MyTool implements ToolInterface {
-
-    @Override
-    public String getName() {
-        return "MyTool";
-    }
-
-    @Override
-    public String getDescription() {
-        return "我的自定义工具";
-    }
-
-    @Override
-    public ToolDefaultType getType() {
-        return ToolDefaultType.ENABLE;
-    }
-
-    @Tool(name = "doSomething", description = "执行某个操作")
-    public String doSomething(String param) {
-        // 实现你的业务逻辑
-        return "操作完成：" + param;
-    }
+```json
+{
+  "groupId": "group-1",
+  "messageId": "msg-1001",
+  "userId": "user-42",
+  "userMessage": "现在几点了？"
 }
 ```
 
-## 📊 架构图
+### 2) 查询群工具配置
 
-```
-┌─────────────────────────────────────┐
-│      REST Controller                │
-│   (GroupChatController)             │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│      Service Layer                  │
-│   (GroupChatService)                │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│      Agent Layer                    │
-│   (Agent, AgentManager)             │
-│   - State Management                │
-│   - Message Chain                   │
-│   - ReAct Loop                      │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│      Tool Layer                     │
-│   (ToolInterface, Tools)            │
-│   - Retry & Timeout                 │
-│   - Metadata                        │
-└─────────────────────────────────────┘
+- 路径: GET /tools/list?groupId=group-1
+
+### 3) 更新群工具开关
+
+- 路径: POST /tools/update
+
+请求示例：
+
+```json
+{
+  "groupId": "group-1",
+  "toolCodes": ["weather", "time"],
+  "enable": true
+}
 ```
 
-## 🧪 测试
+### 4) 重置 Agent
 
-### 运行所有测试
+- 路径: GET /agent/reset?groupId=group-1&messageId=msg-1002
+
+## 测试
+
+运行所有测试：
 
 ```bash
 mvn test
 ```
 
-### 运行特定测试
+运行单个测试类：
 
 ```bash
 mvn test -Dtest=AgentStateManagerTest
 ```
 
-### 测试覆盖
+## 项目结构
 
-- ✅ 单元测试：状态管理、异常体系、工具执行、链路追踪
-- ✅ 集成测试：Agent 集成、工具集成
+```text
+src/main/java/com/bot/akane
+  ├─ agent            Agent 核心逻辑
+  ├─ controller       Web 接口
+  ├─ service          业务服务
+  ├─ mapper           MyBatis Mapper
+  ├─ model            请求/响应/实体模型
+  ├─ config           配置类
+  └─ util             工具类
 
-## 📈 性能指标
-
-- **平均响应时间**：< 5 秒（不含工具调用）
-- **工具调用成功率**：> 95%（含重试）
-- **内存占用**：< 500MB（单个 Agent 实例）
-- **并发支持**：支持 1000+ 并发请求
-
-## 🔐 安全特性
-
-- ✅ 状态转换验证：防止非法状态转换
-- ✅ 工具超时控制：防止长时间阻塞
-- ✅ 分布式锁：防止并发冲突
-- ✅ 异常处理：完善的错误恢复机制
-
-## 🚦 状态转换
-
-```
-IDLE
-  ↓
-THINKING
-  ├→ EXECUTING
-  │   ├→ THINKING（继续循环）
-  │   ├→ FINISHED
-  │   └→ ERROR
-  ├→ FINISHED
-  └→ ERROR
-
-FINISHED/ERROR
-  ↓
-IDLE（重置）
-```
-
-## 📝 配置示例
-
-### application.yaml
-
-```yaml
-server:
-  port: 1145
-
-spring:
-  application:
-    name: akane
-  datasource:
-    url: jdbc:mysql://localhost:3306/akane
-    username: root
-    password: password
-  ai:
-    deepseek:
-      api-key: your_api_key
-      chat:
-        options:
-          model: deepseek-chat
-
-Agent:
-  name: akane-agent
-  system-prompt: |
-    你是一个接入QQ群的AI助手...
-
-DEFAULT_MAX_MESSAGES: 20
-```
-
-## 🐛 故障排查
-
-### 常见问题
-
-1. **Agent 状态异常**
-   - 检查状态转换是否合法
-   - 查看日志中的状态转换记录
-
-2. **工具调用超时**
-   - 增加工具的超时时间
-   - 检查工具实现是否有性能问题
-
-3. **消息丢失**
-   - 检查 chatMemory 的大小限制
-   - 查看 tempMessages 是否正确清理
-
-4. **并发冲突**
-   - 检查 Redis 锁是否正确获取
-   - 查看锁的过期时间是否合理
-
-### 启用调试日志
-
-```yaml
-logging:
-  level:
-    com.bot.akane.agent: DEBUG
-    com.bot.akane.agent.tools: DEBUG
+src/main/resources
+  ├─ application.yaml
+  ├─ application-dev.yaml
+  ├─ schema.sql
+  ├─ db/migration
+  └─ mapper
 ```

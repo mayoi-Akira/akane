@@ -1,26 +1,32 @@
 server:
-  port: 1145
+  port: ${SERVER_PORT:1145}
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: akane
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   cache:
-    type: redis
+    type: ${SPRING_CACHE_TYPE:redis}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/akane?serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
-    username: root
-    password:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/akane?useSSL=false&serverTimezone=UTC}
+    username: ${MYSQL_APP_USER:root}
+    password: ${MYSQL_ROOT_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:1}
   sql:
     init:
       mode: always
-      platform: postgres
   mail:
-    host: smtp.163.com
-    port: 465
-    username:
-    password:
+    host: ${EMAIL_HOST}
+    port: ${EMAIL_PORT}
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
     default-encoding: UTF-8
     properties:
       mail:
@@ -30,16 +36,15 @@ spring:
             enable: true
   ai:
     deepseek:
-      api-key:
+      api-key: ${DEEPSEEK_API_KEY}
       base-url: https://api.deepseek.com
       chat:
         options:
-          model: deepseek-chat
+          model: ${DEEPSEEK_MODEL:deepseek-chat}
 # 和风天气
 weather:
-  api-key:
-  api-host:
-DEFAULT_MAX_MESSAGES:
+  api-key: ${WEATHER_API_KEY}
+  api-host: ${WEATHER_API_URL}
 
 mybatis:
   type-aliases-package: com.bot.akane.model.entity

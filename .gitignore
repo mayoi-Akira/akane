@@ -33,3 +33,11 @@ build/
 .vscode/
 
 application-dev.yaml
+
+### Environment & Secrets ###
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+.env.dev

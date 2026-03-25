@@ -70,7 +70,7 @@ public class ToolsServiceTest {
         String result = nowCoderToolsService.getNowCoderContestInfo("588125209");
         System.out.println(result);
 
-        result = nowCoderToolsService.getNowCoderContestRecord("588125209",10, true);
+        result = nowCoderToolsService.getNowCoderContestRecord("588125209",1, true);
         System.out.println(result);
     }
 
